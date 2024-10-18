@@ -1,30 +1,34 @@
-module ALU();
-
-input [3:0] AluOp  // 4-bit opcode
-input [31:0] busA  // 32-bit input
-input [31:0] busB // 32-bit input
-output [31:0] outBus // 32-bit output
-
-
-output reg Overflow,       // 1-bit overflow output
-
-
-); 
+module ALU(
+    input [3:0] AluOp,         // 4-bit opcode
+    input [31:0] busA,         // 32-bit input A
+    input [31:0] busB,         // 32-bit input B
+    input [15:0] imm,          // 16-bit immediate value
+    output reg [31:0] outBus,  // 32-bit output
+    output reg Overflow        // 1-bit overflow flag
+);
 
     always @(*) begin
-        Overflow = 0; // Default overflow to 0
-     
+        // Default values
+        Overflow = 0;
+        outBus = 32'b0;
 
-		case (AluOp)
-				4'b0000: Result = busA & busB; // AND operation
-				4'b0001: Result = busA | busB; // or operation
-				4'b0010: Result = busA ^ busB; // XOR operation
-				4'b0011: Result = busA ~ busB; // NOT operation
-				4'b0100: Result = busA + busB; // ADD operation
-				4'b0101: Result = busA - busB; // SUB operation
-				4'b0110: Result =	(busA < busB) ? 4'b001 : 4'b000; // Compare (A < B)
-				4'b1010: Result =		; // SL operation
-				4'b1011: Result =		; // SR operation
-				4'b1101: Result =		; // LUI operation
-				
+        case (AluOp)
+            4'b0000: outBus = busA & busB;        // AND operation
+            4'b0001: outBus = busA | busB;        // OR operation
+            4'b0010: outBus = busA ^ busB;        // XOR operation
+            4'b0011: outBus = ~busA;              // NOT operation
+            4'b0100: begin                        // ADD operation
+                {Overflow, outBus} = busA + busB; // Detect overflow
+            end
+            4'b0101: begin                        // SUB operation
+                {Overflow, outBus} = busA - busB; // Detect overflow
+            end
+            4'b0110: outBus = (busA < busB) ? 32'b1 : 32'b0;  // Compare (A < B)
+            4'b1010: outBus = busA << imm[4:0];               // Shift left by imm
+            4'b1011: outBus = busA >> imm[4:0];               // Shift right by imm
+            4'b1101: outBus = imm << 16;                      // Load upper immediate (LUI)
+            default: outBus = 32'b0;                          // Default case (NOP)
+        endcase
+    end
+
 endmodule
