@@ -1,78 +1,164 @@
-module alu_tb;
+`timescale 1ns / 1ps
 
-    // Inputs to the ALU
+module ALU_tb;
+
+    // Inputs
     reg [3:0] AluOp;
     reg [31:0] busA;
     reg [31:0] busB;
-    reg [15:0] imm;
 
-    // Outputs from the ALU
+    // Outputs
     wire [31:0] outBus;
-    wire Overflow;
 
-    // Instantiate the ALU
+    // Instantiate the ALU module
     ALU uut (
         .AluOp(AluOp),
         .busA(busA),
         .busB(busB),
-        .imm(imm),
-        .outBus(outBus),
-        .Overflow(Overflow)
+        .outBus(outBus)
     );
 
-    // Test stimulus
+    // Task to display results
+    task display_result;
+        begin
+            $display("Time=%0t | AluOp=%b | busA=%d | busB=%d | outBus=%d",
+                     $time, AluOp, busA, busB, outBus);
+        end
+    endtask
+
     initial begin
-        // Monitor signals
-        $monitor("Time: %0d, AluOp: %b, busA: %h, busB: %h, imm: %h, outBus: %h, Overflow: %b",
-                 $time, AluOp, busA, busB, imm, outBus, Overflow);
-                 
-        // Initialize inputs to 16 for busA and busB, immediate to 4
-        busA = 32'h10;  // Set busA to 16 (0x10)
-        busB = 32'h10;  // Set busB to 16 (0x10)
-        imm = 16'h0004; // Set imm to 4 (0x4)
-
-        // Test AND operation (AluOp = 0000)
+        // Initialize Inputs
         AluOp = 4'b0000;
+        busA = 32'd0;
+        busB = 32'd0;
+
+        // Wait for global reset
         #10;
-        
-        // Test OR operation (AluOp = 0001)
+
+        // -------------------------------------
+        // 1. Test AND operation (AluOp = 0000)
+        // -------------------------------------
+        AluOp = 4'b0000;
+        busA = 4;   // 0100
+        busB = 3;   // 0011
+        #10;
+        display_result(); // Expected outBus = 0
+
+        // -------------------------------------
+        // 2. Test OR operation (AluOp = 0001)
+        // -------------------------------------
         AluOp = 4'b0001;
+        busA = 4;   // 0100
+        busB = 3;   // 0011
         #10;
-        
-        // Test XOR operation (AluOp = 0010)
+        display_result(); // Expected outBus = 7
+
+        // -------------------------------------
+        // 3. Test XOR operation (AluOp = 0010)
+        // -------------------------------------
         AluOp = 4'b0010;
+        busA = 5;   // 0101
+        busB = 3;   // 0011
         #10;
-        
-        // Test NOT operation (AluOp = 0011)
+        display_result(); // Expected outBus = 6
+
+        // -------------------------------------
+        // 4. Test NOT operation (AluOp = 0011)
+        // -------------------------------------
         AluOp = 4'b0011;
+        busA = 1;   // 0001
+        busB = 0;   // Ignored
         #10;
+        display_result(); // Expected outBus = ~1 = 4294967294
 
-        // Test ADD operation (AluOp = 0100)
+        // -------------------------------------
+        // 5. Test ADD operation without overflow (AluOp = 0100)
+        // -------------------------------------
         AluOp = 4'b0100;
+        busA = 10;
+        busB = 15;
         #10;
+        display_result(); // Expected outBus = 25
 
-        // Test SUB operation (AluOp = 0101)
+        // -------------------------------------
+        // 6. Test ADD operation with potential overflow (AluOp = 0100)
+        // Note: Overflow is not flagged in this version
+        // -------------------------------------
+        AluOp = 4'b0100;
+        busA = 2147483647; // Max positive for 32-bit signed
+        busB = 1;
+        #10;
+        display_result(); // Expected outBus = -2147483648 (due to wrap-around)
+
+        // -------------------------------------
+        // 7. Test SUB operation without overflow (AluOp = 0101)
+        // -------------------------------------
         AluOp = 4'b0101;
+        busA = 20;
+        busB = 5;
         #10;
-        
-        // Test Compare (AluOp = 0110)
+        display_result(); // Expected outBus = 15
+
+        // -------------------------------------
+        // 8. Test SUB operation with potential overflow (AluOp = 0101)
+        // Note: Overflow is not flagged in this version
+        // -------------------------------------
+        AluOp = 4'b0101;
+        busA = -2147483648; // Min negative for 32-bit signed
+        busB = 1;
+        #10;
+        display_result(); // Expected outBus = 2147483647 (due to wrap-around)
+
+        // -------------------------------------
+        // 9. Test Compare (A < B) operation (AluOp = 0110)
+        // -------------------------------------
         AluOp = 4'b0110;
+        busA = 5;
+        busB = 10;
         #10;
-        
-        // Test Shift Left (AluOp = 1010)
+        display_result(); // Expected outBus = 1
+
+        AluOp = 4'b0110;
+        busA = 15;
+        busB = 10;
+        #10;
+        display_result(); // Expected outBus = 0
+
+        // -------------------------------------
+        // 10. Test Shift Left operation (AluOp = 1010)
+        // -------------------------------------
         AluOp = 4'b1010;
-        imm = 16'h0004; // Shift left by 4
+        busA = 1;   // 0001
+        busB = 2;   // Shift left by 2
         #10;
+        display_result(); // Expected outBus = 4
 
-        // Test Shift Right (AluOp = 1011)
+        // -------------------------------------
+        // 11. Test Shift Right operation (AluOp = 1011)
+        // -------------------------------------
         AluOp = 4'b1011;
-        imm = 16'h0004; // Shift right by 4
+        busA = 8;   // 1000
+        busB = 3;   // Shift right by 3
         #10;
+        display_result(); // Expected outBus = 1
 
-        // Test LUI (AluOp = 1101)
+        // -------------------------------------
+        // 12. Test Load Upper Immediate (LUI) operation (AluOp = 1101)
+        // -------------------------------------
         AluOp = 4'b1101;
-        imm = 16'h0004; // Load upper immediate with 4
+        busA = 0;   // Ignored
+        busB = 1;   // Load 1 into upper 16 bits
         #10;
+        display_result(); // Expected outBus = 65536
+
+        // -------------------------------------
+        // 13. Test Default case (NOP)
+        // -------------------------------------
+        AluOp = 4'b1111; // Undefined opcode
+        busA = 123;
+        busB = 456;
+        #10;
+        display_result(); // Expected outBus = 0
 
         // Finish simulation
         $finish;
