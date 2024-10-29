@@ -18,6 +18,7 @@ wire [3:0] opcode, Ra, Rb, Rd;
 wire [15:0] imm;
 wire [31:0] extended_imm;
 
+parameter pc_count = 32'd4;
 
 // Control signals
 //wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq;
@@ -31,7 +32,7 @@ assign Rb = instruction[19:16];
 assign imm = instruction[15:0];
 
 // Mux outputs
-wire [31:0] mux1_out, mux2_out, mux7_out, adder_out;
+wire [31:0] mux1_out, mux2_out, mux7_out,adder_out;
 //, mux3_out, adder_out, ALU_out, mux6_out;
 // Mux inputs
 wire [31:0] mux4_out0, mux5_out0;
@@ -91,13 +92,13 @@ sign_extend extend (
 // Multiplexer instances
 mux mux1 (
     .in0(adder_out),
-    .in1(Ra_rf),
+    .in1(mux2_out),
     .control(M1),
     .out(mux1_out)
 );
 
 mux mux2 (
-    .in0(32'd4),
+    .in0(pc_count),
     .in1(extended_imm),
     .control(M2),
     .out(mux2_out)
@@ -146,13 +147,5 @@ ALU alu (
     .busB(mux6_out),
     .outBus(ALU_out)
 );
-
-// Always block to update 'pc'
-always @(posedge clk or negedge rst) begin
-    if (!rst)
-        pc <= 32'b0;           // Reset 'pc' to 0
-    else
-        pc <= mux1_out;        // Update 'pc' with 'mux1_out' on clock edge
-end
 
 endmodule

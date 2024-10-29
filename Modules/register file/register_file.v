@@ -18,18 +18,18 @@ module register_file (
     // Initialize all registers to 0 at the start of the simulation
     initial begin
         for (i = 0; i < 16; i = i + 1) begin
-            registers[i] = 32'b0;
+            registers[i] <= 32'b0;
         end
     end
 
     // Read operations
     always @(*) begin
-        data_Ra = registers[read_Ra];
-        data_Rb = registers[read_Rb];
+        data_Ra <= registers[read_Ra];
+        data_Rb <= registers[read_Rb];
     end
 
     // Write operation with synchronized active-low reset
-    always @(posedge clk) begin
+    always @(negedge clk) begin
         if (!rst_n) begin
             // Reset all registers to 0 when rst_n is low
             for (i = 0; i < 16; i = i + 1) begin
