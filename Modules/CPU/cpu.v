@@ -1,24 +1,28 @@
 module cpu(
-    input clk,
-    input rst,
-    input wire [31:0] instruction
+   input clk,
+   input rst,
+   input wire [31:0] instruction,
+	output [31:0] Ra_rf, Rb_rf,
+	output reg [31:0] pc,
+	output M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq,
+	output [3:0] ALU,
+	output [31:0] mux3_out,
+	output [31:0] mux4_out1, mux5_out1, mux6_out
 );
 
-reg [31:0] PC;
 
-// Instead of memory
-wire [31:0] Din, Address;
+//reg [31:0] pc;
 
 // Initialize opcode, registers.
 wire [3:0] opcode, Ra, Rb, Rd;
 wire [15:0] imm;
 wire [31:0] extended_imm;
 
-parameter PC_count = 32'd4;
+parameter pc_count = 32'd4;
 
 // Control signals
-wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq;
-wire [3:0] ALU;
+//wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq;
+//wire [3:0] ALU;
 
 // Instruction decoding
 assign opcode = instruction[31:28];
@@ -28,13 +32,17 @@ assign Rb = instruction[19:16];
 assign imm = instruction[15:0];
 
 // Mux outputs
-wire [31:0] mux1_out, mux2_out, mux3_out, mux6_out, mux7_out, adder_out, ALU_out;
+wire [31:0] mux1_out, mux2_out, mux7_out,adder_out, ALU_out;
+//, mux3_out, adder_out, ALU_out, mux6_out;
 // Mux inputs
-wire [31:0] mux4_out0, mux4_out1, mux5_out0, mux5_out1;
+wire [31:0] mux4_out0, mux5_out0;
+// mux4_out1, mux5_out1
 
-wire [31:0] Ra_rf, Rb_rf;
+//assign out = mux7_out;
+
+//wire [31:0] Ra_rf, Rb_rf;
 initial begin
-    PC = 32'b0;
+    pc = 32'b0;
 end
 
 // Equality check
@@ -43,7 +51,7 @@ assign Eq = (Ra_rf == Rb_rf) ? 1'b1 : 1'b0;
 
 // Adder instance
 adder add (
-    .a(PC),
+    .a(pc),
     .b(mux2_out),
     .out(adder_out)
 );
@@ -90,7 +98,7 @@ mux mux1 (
 );
 
 mux mux2 (
-    .in0(PC_count),
+    .in0(pc_count),
     .in1(extended_imm),
     .control(M2),
     .out(mux2_out)
@@ -98,7 +106,7 @@ mux mux2 (
 
 mux mux3 (
     .in0(Rd),
-    .in1(PC),
+    .in1(pc),
     .control(M3),
     .out(mux3_out)
 );
@@ -122,7 +130,7 @@ decoder mux4 (
     .in(Rb_rf),
     .control(M4),
     .out0(mux4_out0),
-    .out1(mux5_out1)
+    .out1(mux4_out1)
 );
 
 decoder mux5 (

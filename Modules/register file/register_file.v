@@ -38,6 +38,7 @@ module register_file (
         end 
         // Write data to the specified register
         registers[write_Rd] <= write_data;
+		  registers[0] = 0;
     end
 
 endmodule
