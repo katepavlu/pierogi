@@ -1,4 +1,4 @@
-module mem_ctrl( 
+module mem_virtualizer( 
 	input wire [31:0] dataInVirt,
 	input wire [31:0] addressVirt,
 	output reg [31:0] dataOutVirt,
@@ -41,6 +41,15 @@ module mem_ctrl(
 	assign rstIO = rstVirt;
 	
 	always @(*) begin
+		dataOutVirt = 0;
+		
+		addressPhys = 0;
+		dataInPhys = 0;
+		wEnPhys = 0;
+		
+		addressIO = 0;
+		dataInIO = 0;
+		wEnIO = 0;
 	
 		if ( VIRT_TEXT_START <= addressVirt <= VIRT_TEXT_END ) begin
 				dataInPhys = dataInVirt;
@@ -65,98 +74,8 @@ module mem_ctrl(
 				wEnIO = wEnVirt;
 				wEnPhys = 0;
 		end
-		
-		else begin
-				wEnPhys = 0;
-				wEnIO = 0;
-				dataOutVirt = 0;
-		end
 	end
 endmodule
-
-module hex_driver(
-	input [3:0]din, 
-	output reg [7:0] LEDpins);
-	
-	always @(*) begin
-		case(din)
-			0:begin  LEDpins=~7'b0111111; end
-			1:begin  LEDpins=~7'b0000110; end
-			2:begin  LEDpins=~7'b1011011; end
-			3:begin  LEDpins=~7'b1001111; end
-			4:begin  LEDpins=~7'b1100110; end
-			5:begin  LEDpins=~7'b1101101; end
-			6:begin  LEDpins=~7'b1111101; end
-			7:begin  LEDpins=~7'b0000111; end
-			8:begin  LEDpins=~7'b1111111; end
-			9:begin  LEDpins=~7'b1100111; end
-			default:begin  LEDpins=~7'b0111111; end
-		endcase
-	end
-endmodule
-
-module display_peripheral(
-	input wire  signed [31:0] din,
-	output wire [7:0] hex0,
-	output wire [7:0] hex1,
-	output wire [7:0] hex2,
-	output wire [7:0] hex3,
-	output wire [7:0] hex4,
-	output wire [7:0] hex5,
-	output wire [7:0] hex6,
-	output wire [7:0] hex7,
-	output wire [7:0] hex8,
-	output wire [7:0] hex9,
-	output wire [7:0] hex10);
-	
-	hex_driver d0(
-		.din((din/1) % 10),
-		.LEDpins(hex0)
-	);
-	hex_driver d1(
-		.din((din/10) % 10),
-		.LEDpins(hex1)
-	);
-	hex_driver d2(
-		.din((din/100) % 10),
-		.LEDpins(hex2)
-	);
-	hex_driver d3(
-		.din((din/1_000) % 10),
-		.LEDpins(hex3)
-	);
-	hex_driver d4(
-		.din((din/10_000) % 10),
-		.LEDpins(hex4)
-	);
-	hex_driver d5(
-		.din((din/100_000) % 10),
-		.LEDpins(hex5)
-	);
-	hex_driver d6(
-		.din((din/1000_000) % 10),
-		.LEDpins(hex6)
-	);
-	hex_driver d7(
-		.din((din/10_000_000) % 10),
-		.LEDpins(hex7)
-	);
-	hex_driver d8(
-		.din((din/100_000_000) % 10),
-		.LEDpins(hex8)
-	);
-	hex_driver d9(
-		.din((din/1_000_000_000) % 10),
-		.LEDpins(hex9)
-	);
-	
-	assign hex10[0:5] = 0;
-	assign hex10[6] = din[31];
-	assign hex10[7] = 0;
-	
-	
-endmodule
-
 
 
 module Memory_controller(
@@ -172,11 +91,12 @@ module Memory_controller(
 		.hex3(HEX3),
 		.hex4(HEX4),
 		.hex5(HEX5),
-		.hex6(GPIO_1[6:0]),
-		.hex7(GPIO_1[13:7]),
-		.hex8(GPIO_1[20:15]),
-		.hex9(GPIO_1[28:21]),
-		.sign(GPIO_1[29])		
+		.hex6(GPIO_0[6:0]),
+		.hex7(GPIO_0[13:7]),
+		.hex8(GPIO_0[20:14]),
+		.hex9(GPIO_0[27:21]),
+		.hex10(GPIO_0[34:28]),
+		.dot(GPIO_0[35])
 	);
 	
 	
