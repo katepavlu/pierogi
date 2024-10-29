@@ -16,7 +16,7 @@ module peripheral_controller(
 	input wire [3:0]cols,
 	
 	input wire clk,
-	input wire [1:0]address,
+	input wire [3:0]address,
 	input wire din,
 	input wire writeEnable,
 	output reg dout);
@@ -29,10 +29,10 @@ module peripheral_controller(
 		dout <= 0;
 		
 		case(address)
-			2'h0: begin
+			3'h0: begin
 				dout <= keyboard_dout;
 			end
-			2'h4: begin
+			3'h4: begin
 				if (writeEnable == 1) display_din <= din;
 			end
 		endcase

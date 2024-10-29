@@ -2,13 +2,13 @@ module sdram_controller (
     input            clk,        // System clock
     input            reset,      // Asynchronous reset
     input            we,         // Write enable
-    input  [23:0]    addr,       // Address bus (24-bit for 64MB)
-    input  [15:0]    data_in,    // Data input (16-bit)
-    output reg [15:0] data_out,  // Data output (16-bit)
+    input  [31:0]    addr,       // Address bus (32-bit for larger addressing space)
+    input  [31:0]    data_in,    // Data input (32-bit)
+    output reg [31:0] data_out,  // Data output (32-bit)
 
     // SDRAM interface
     output reg [12:0] DRAM_ADDR, // SDRAM address bus
-    inout  [15:0]    DRAM_DQ,    // SDRAM data bus
+    inout  [31:0]    DRAM_DQ,    // SDRAM data bus (32-bit)
     output reg       DRAM_WE_N,  // SDRAM Write Enable
     output reg       DRAM_CAS_N, // SDRAM Column Address Strobe
     output reg       DRAM_RAS_N, // SDRAM Row Address Strobe
@@ -29,7 +29,7 @@ module sdram_controller (
     
     reg [3:0] state, next_state;
     
-    reg [15:0] data_buffer;      // Buffer to hold data to be written
+    reg [31:0] data_buffer;      // Buffer to hold data to be written (32-bit)
     reg data_direction;          // 0 = Read, 1 = Write
     reg [15:0] refresh_counter;  // Counter for refresh and delay
     reg [9:0]  init_delay_count; // Counter for initialization delay
@@ -38,7 +38,7 @@ module sdram_controller (
     assign DRAM_CLK = clk;
 
     // Tri-state buffer for data lines
-    assign DRAM_DQ = (data_direction) ? data_buffer : 16'bz;
+    assign DRAM_DQ = (data_direction) ? data_buffer : 32'bz;
 
     // State transition
     always @(posedge clk or posedge reset) begin
