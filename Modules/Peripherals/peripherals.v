@@ -40,33 +40,31 @@ module peripherals(
 	
 	wire clkd;
 	
-	// copy the pin assignments from here
-	display_peripheral dp0(
-		.din(data_out),
-		.hex0(HEX0),
-		.hex1(HEX1),
-		.hex2(HEX2),
-		.hex3(HEX3),
-		.hex4(HEX4),
-		.hex5(HEX5),
-		.hex6(GPIO_0[6:0]),
-		.hex7(GPIO_0[13:7]),
-		.hex8(GPIO_0[20:14]),
-		.hex9(GPIO_0[27:21]),
-		.hex10(GPIO_0[34:28]),
-		.dot(GPIO_0[35])
-	);
-	
-	keypad_peripheral kp0(
-		.cols(GPIO_1[35:32]),
-		.rows(GPIO_1[31:28]),
+	peripheral_controller pc0(
+		.hex0(hex0),
+		.hex1(hex1),
+		.hex2(hex2),
+		.hex3(hex3),
+		.hex4(hex4),
+		.hex5(hex5),
+		.hex6(hex6),
+		.hex7(hex7),
+		.hex8(hex8),
+		.hex9(hex9),
+		.hex10(hex10),
+		.dot(dot),
+		.rows(rows),
+		.cols(GPIO_1[35:32]),  // Assume GPIO_1[35:32] are the column inputs for keypad
 		.clk(clkd),
-		.out(data_out)
+		.address(address),
+		.din(din),
+		.writeEnable(writeEnable),
+		.dout(dout)
 	);
 	
 	ClockDivider ckd0(
 		.clk(CLOCK_50),
-		.clkd(clkd),
+		.clkd(clkd)
 	);
 	
 /*	// a simple dummy program
