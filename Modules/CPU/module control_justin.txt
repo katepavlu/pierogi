@@ -1,0 +1,71 @@
+module control(
+    input wire [3:0] opcode,
+    input wire Eq, 
+    output reg M1, 
+    output reg M2,
+    output reg M3, 
+    output reg M4,
+    output reg M5, 
+    output reg M6,
+    output reg M7, 
+    output reg [3:0] ALU,
+    output reg Wr_en
+);
+
+    initial begin
+        M1 = 1'b0;
+        M2 = 1'b0;
+        M3 = 1'b0;
+        M4 = 1'b0;
+        M5 = 1'b0;
+        M6 = 1'b0;
+        M7 = 1'b0;
+        ALU = 4'b0000;
+        Wr_en = 1'b0;
+    end
+
+    always @(opcode or Eq) begin
+        // Default values for control signals
+        M1 = 1'b0;
+        M2 = 1'b0;
+        M3 = 1'b0;
+        M4 = 1'b0;
+        M5 = 1'b0;
+        M6 = 1'b0;
+        M7 = 1'b0;
+        ALU = 4'b0000;
+        Wr_en = 1'b0;
+
+        case (opcode)
+            // Existing opcodes remain unchanged...
+            // ...
+
+            4'b0111: begin // j $rd, $ra
+                M1 = 1'b1;      // Select Ra_rf for PC update
+                M2 = 1'b0;      // Not using immediate for PC
+                M3 = 1'b1;      // Write to Rd
+                M4 = 1'b0;      // Not using decoder outputs
+                M5 = 1'b0;      // Not using decoder outputs
+                M6 = 1'b0;      // Not using immediate in ALU
+                M7 = 1'b1;      // Select PC as data to write back
+                ALU = 4'b0000;  // ALU operation doesn't matter here
+                Wr_en = 1'b1;   // Enable write to register file
+            end
+            4'b1000: begin // beq $ra, $rb, Imm
+                M1 = 1'b0;      // Use adder output for PC
+                M2 = Eq;        // If equal, use Imm; else, increment by 4
+                M3 = 1'b0;      // No register write
+                Wr_en = 1'b0;   // Disable write to register file
+            end
+            4'b1001: begin // bne $ra, $rb, Imm
+                M1 = 1'b0;      // Use adder output for PC
+                M2 = ~Eq;       // If not equal, use Imm; else, increment by 4
+                M3 = 1'b0;      // No register write
+                Wr_en = 1'b0;   // Disable write to register file
+            end
+
+            // Existing opcodes continue...
+            // ...
+        endcase
+    end
+endmodule

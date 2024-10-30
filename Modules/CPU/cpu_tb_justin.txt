@@ -1,0 +1,164 @@
+`timescale 1ns / 1ps
+
+module cpu_testbench;
+
+    reg clk;
+    reg rst;
+    reg [31:0] instruction;
+    wire [31:0] Ra_rf, Rb_rf;
+    wire [31:0] pc;
+    wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq;
+    wire [3:0] ALU;
+    wire [3:0] mux3_out;
+    wire [31:0] mux4_out1, mux5_out1, mux6_out, ALU_out;
+
+    // Instantiate the CPU
+    cpu uut (
+        .clk(clk),
+        .rst(rst),
+        .instruction(instruction),
+        .Ra_rf(Ra_rf),
+        .Rb_rf(Rb_rf),
+        .pc(pc),
+        .M1(M1),
+        .M2(M2),
+        .M3(M3),
+        .M4(M4),
+        .M5(M5),
+        .M6(M6),
+        .M7(M7),
+        .Wr_en(Wr_en),
+        .Eq(Eq),
+        .ALU(ALU),
+        .mux3_out(mux3_out),
+        .mux4_out1(mux4_out1),
+        .mux5_out1(mux5_out1),
+        .mux6_out(mux6_out),
+        .ALU_out(ALU_out)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // 100MHz clock
+    end
+
+    // Test vectors
+    initial begin
+        // Initialize reset
+        rst = 0;
+        #10;
+        rst = 1;
+
+        // Wait for reset
+        #10;
+
+        // -------------------------------
+        // Test opcode 0x7: j $rd, $ra
+        // -------------------------------
+        // Let's assume Ra contains address 100, and Rd is register 2
+        // Instruction format: [opcode][Rd][Ra][Rb][imm]
+        // For j instruction, Rb and imm are don't care
+        instruction = {4'h7, 4'd2, 4'd1, 4'd0, 16'd0}; // j $2, $1
+
+        // Set Ra_rf to 100
+        uut.RF.registers[1] = 32'd100;
+
+        // Wait for the instruction to execute
+        #10;
+
+        // Verify that PC is updated to 100 and Rd (register 2) contains the old PC value (which was 0)
+        $display("After j instruction:");
+        $display("PC = %d", pc);
+        $display("Register 2 = %d", uut.RF.registers[2]);
+
+        // -------------------------------
+        // Test opcode 0x8: beq $ra, $rb, Imm
+        // Case 1: Ra == Rb (PC should change)
+        // -------------------------------
+        // Set Ra_rf and Rb_rf to equal values
+        uut.RF.registers[3] = 32'd50;
+        uut.RF.registers[4] = 32'd50;
+
+        // Set PC to 100
+        uut.pc = 32'd100;
+
+        // Instruction: beq $3, $4, Imm (Imm = 20)
+        instruction = {4'h8, 4'd0, 4'd3, 4'd4, 16'd20};
+
+        // Wait for the instruction to execute
+        #10;
+
+        // Verify that PC is updated to 120 (100 + 20)
+        $display("After beq instruction (equal registers):");
+        $display("PC = %d", pc);
+
+        // -------------------------------
+        // Test opcode 0x8: beq $ra, $rb, Imm
+        // Case 2: Ra != Rb (PC should not change significantly)
+        // -------------------------------
+        // Set Ra_rf and Rb_rf to different values
+        uut.RF.registers[3] = 32'd50;
+        uut.RF.registers[4] = 32'd60;
+
+        // Set PC to 200
+        uut.pc = 32'd200;
+
+        // Instruction: beq $3, $4, Imm (Imm = 30)
+        instruction = {4'h8, 4'd0, 4'd3, 4'd4, 16'd30};
+
+        // Wait for the instruction to execute
+        #10;
+
+        // Verify that PC is updated by default increment (e.g., +4)
+        $display("After beq instruction (unequal registers):");
+        $display("PC = %d", pc);
+
+        // -------------------------------
+        // Test opcode 0x9: bne $ra, $rb, Imm
+        // Case 1: Ra != Rb (PC should change)
+        // -------------------------------
+        // Set Ra_rf and Rb_rf to different values
+        uut.RF.registers[5] = 32'd30;
+        uut.RF.registers[6] = 32'd40;
+
+        // Set PC to 300
+        uut.pc = 32'd300;
+
+        // Instruction: bne $5, $6, Imm (Imm = 50)
+        instruction = {4'h9, 4'd0, 4'd5, 4'd6, 16'd50};
+
+        // Wait for the instruction to execute
+        #10;
+
+        // Verify that PC is updated to 350 (300 + 50)
+        $display("After bne instruction (unequal registers):");
+        $display("PC = %d", pc);
+
+        // -------------------------------
+        // Test opcode 0x9: bne $ra, $rb, Imm
+        // Case 2: Ra == Rb (PC should not change significantly)
+        // -------------------------------
+        // Set Ra_rf and Rb_rf to equal values
+        uut.RF.registers[5] = 32'd70;
+        uut.RF.registers[6] = 32'd70;
+
+        // Set PC to 400
+        uut.pc = 32'd400;
+
+        // Instruction: bne $5, $6, Imm (Imm = 60)
+        instruction = {4'h9, 4'd0, 4'd5, 4'd6, 16'd60};
+
+        // Wait for the instruction to execute
+        #10;
+
+        // Verify that PC is updated by default increment (e.g., +4)
+        $display("After bne instruction (equal registers):");
+        $display("PC = %d", pc);
+
+        // Finish simulation
+        #20;
+        $stop;
+    end
+
+endmodule
