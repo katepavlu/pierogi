@@ -1,27 +1,33 @@
 module cpu(
    input clk,
    input rst,
-   input wire [31:0] instruction,
-	output [31:0] Ra_rf, Rb_rf,
-	output reg [31:0] pc,
-	output M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq,
-	output [3:0] ALU,
-	output [3:0] mux3_out,
-	output [31:0] mux4_out1, mux5_out1, mux6_out, ALU_out
+	output reg clk0, clk2,
+   output reg [31:0] instruction,
+   output [31:0] Ra_rf, Rb_rf,
+   output reg [31:0] pc,
+   output M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq,
+   output [3:0] ALU,
+   output [31:0] mux5_out0, mux4_out0, mux6_out, mux7_out
 );
 
+reg locked;
+pll pll_inst (
+		.refclk   (clk),   //  refclk.clk
+		.rst      (rst),      //   reset.reset
+		.outclk_0 (clk0), // outclk0.clk
+		.outclk_1 (clk2), // outclk1.clk
+		.locked   (locked)    //  locked.export
+	);
+	
 
-//reg [31:0] pc;
+// Memory unit
+reg [31:0] address;
+wire [31:0] memory_out;
 
 // Initialize opcode, registers.
 wire [3:0] opcode, Ra, Rb, Rd;
 wire [15:0] imm;
 wire [31:0] extended_imm;
-
-
-// Control signals
-//wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq;
-//wire [3:0] ALU;
 
 // Instruction decoding
 assign opcode = instruction[31:28];
@@ -31,22 +37,26 @@ assign Rb = instruction[19:16];
 assign imm = instruction[15:0];
 
 // Mux outputs
-wire [31:0] mux1_out, mux2_out, mux7_out, adder_out;
-//, mux3_out, adder_out, ALU_out, mux6_out;
-// Mux inputs
-wire [31:0] mux4_out0, mux5_out0;
-// mux4_out1, mux5_out1
+wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out;
 
-//assign out = mux7_out;
+// Declare outputs for mux4 and mux5
+wire [31:0] mux4_out1, mux5_out1;
 
-//wire [31:0] Ra_rf, Rb_rf;
+always @(posedge clk0) begin
+    if (clk2) begin
+        address = pc;
+		  instruction = memory_out;
+		  end else 
+        address = mux4_out0;
+end
+
+// Initialize pc
 initial begin 
     pc = 32'b0;
 end
 
 // Equality check
 assign Eq = (Ra_rf == Rb_rf) ? 1'b1 : 1'b0;
-
 
 // Adder instance
 adder add (
@@ -57,12 +67,12 @@ adder add (
 
 // Register file instance
 register_file RF (
-    .clk(clk),
+    .clk(clk2),
     .rst_n(rst),
     .read_Ra(Ra),
     .read_Rb(Rb),
-    .write_Rd(mux3_out),
-    .write_data(mux7_out),
+    .write_Rd(Rd),
+    .write_data(mux3_out),
     .data_Ra(Ra_rf),
     .data_Rb(Rb_rf)
 );
@@ -103,8 +113,8 @@ mux mux2 (
     .out(mux2_out)
 );
 
-mux3 mux3 (
-    .in0(Rd),
+mux mux3 (
+    .in0(mux7_out),
     .in1(pc),
     .control(M3),
     .out(mux3_out)
@@ -118,7 +128,7 @@ mux mux6 (
 );
 
 mux mux7 (
-    .in0(mux5_out0),
+    .in0(memory_out),
     .in1(ALU_out),
     .control(M7),
     .out(mux7_out)
@@ -147,12 +157,20 @@ ALU alu (
     .outBus(ALU_out)
 );
 
+BRAM ram(
+		.addr(address),
+		.din(mux5_out0),
+		.clk(clk0),
+		.wren(Wr_en),
+		.dout(memory_out)
+	);
+
 // Always block to update 'pc'
-always @(posedge clk or negedge rst) begin
+always @(negedge clk2 or negedge rst) begin
     if (!rst)
-        pc <= 32'b0;           // Reset 'pc' to 0
+        pc <= 32'b0;
     else
-        pc <= mux1_out;        // Update 'pc' with 'mux1_out' on clock edge
+        pc <= mux1_out;
 end
 
 endmodule
