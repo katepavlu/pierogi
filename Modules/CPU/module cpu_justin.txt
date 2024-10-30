@@ -48,8 +48,8 @@ module cpu(
         .rst_n(rst),
         .read_Ra(Ra),
         .read_Rb(Rb),
-        .write_Rd(mux3_out),
-        .write_data(mux7_out),
+        .write_Rd(Rd),
+        .write_data(mux3_out),
         .data_Ra(Ra_rf),
         .data_Rb(Rb_rf)
     );
@@ -90,8 +90,8 @@ module cpu(
         .out(mux2_out)
     );
 
-    mux3 mux3 (
-        .in0(Rd),
+    mux mux3 (
+        .in0(mux7_out),
         .in1(4'b1111), // Using register 15 for PC storage if needed
         .control(M3),
         .out(mux3_out)

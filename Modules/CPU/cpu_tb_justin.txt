@@ -9,7 +9,7 @@ module cpu_testbench;
     wire [31:0] pc;
     wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq;
     wire [3:0] ALU;
-    wire [3:0] mux3_out;
+    wire [31:0] mux3_out; // Changed to 32 bits
     wire [31:0] mux4_out1, mux5_out1, mux6_out, ALU_out;
 
     // Instantiate the CPU
@@ -65,7 +65,7 @@ module cpu_testbench;
         uut.RF.registers[1] = 32'd100;
 
         // Wait for the instruction to execute
-        #10;
+        #20; // Adjusted delay due to negedge pc update
 
         // Verify that PC is updated to 100 and Rd (register 2) contains the old PC value (which was 0)
         $display("After j instruction:");
@@ -87,7 +87,7 @@ module cpu_testbench;
         instruction = {4'h8, 4'd0, 4'd3, 4'd4, 16'd20};
 
         // Wait for the instruction to execute
-        #10;
+        #20;
 
         // Verify that PC is updated to 120 (100 + 20)
         $display("After beq instruction (equal registers):");
@@ -108,7 +108,7 @@ module cpu_testbench;
         instruction = {4'h8, 4'd0, 4'd3, 4'd4, 16'd30};
 
         // Wait for the instruction to execute
-        #10;
+        #20;
 
         // Verify that PC is updated by default increment (e.g., +4)
         $display("After beq instruction (unequal registers):");
@@ -129,7 +129,7 @@ module cpu_testbench;
         instruction = {4'h9, 4'd0, 4'd5, 4'd6, 16'd50};
 
         // Wait for the instruction to execute
-        #10;
+        #20;
 
         // Verify that PC is updated to 350 (300 + 50)
         $display("After bne instruction (unequal registers):");
@@ -150,7 +150,7 @@ module cpu_testbench;
         instruction = {4'h9, 4'd0, 4'd5, 4'd6, 16'd60};
 
         // Wait for the instruction to execute
-        #10;
+        #20;
 
         // Verify that PC is updated by default increment (e.g., +4)
         $display("After bne instruction (equal registers):");
