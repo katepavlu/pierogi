@@ -1,75 +1,79 @@
 module keypad_peripheral(
-	output reg [3:0] cols,
-	input wire [3:0] rows,
-	input clk,
-	output reg [7:0] out);
-	
-	parameter _4 = 4'b0001;
-	parameter _3 = 4'b0010;
-	parameter _2 = 4'b0100;
-	parameter _1 = 4'b1000;
-	
-	reg [7:0] c1;
-	reg [7:0] c2;
-	reg [7:0] c3;
-	reg [7:0] c4;
-	
-	initial begin
-		cols <= _1;
-		out <= 0;
-	end
-	
-	always @(posedge clk) begin
-		case(cols)
-			_1: begin 
-				case (rows)
-					_1: c1 <= 8'd49;
-					_2: c1 <= 8'd52;
-					_3: c1 <= 8'd55;
-					_4: c1 <= 8'd42;
-					default: c1 <= 0;
-				endcase
-				cols <= _2;
-			end
-			_2: begin
-				case (rows)
-					_1: c2 <= 8'd50;
-					_2: c2 <= 8'd53;
-					_3: c2 <= 8'd56;
-					_4: c2 <= 8'd48;
-					default: c2 <= 0;
-				endcase
-				cols <= _3;
-			end
-			_3:begin
-				case (rows)
-					_1: c3 <= 8'd51;
-					_2: c3 <= 8'd54;
-					_3: c3 <= 8'd57;
-					_4: c3 <= 8'd35;
-					default: c3 <= 0;
-				endcase
-				cols <= _4;
-			end
-			_4:begin
-				case (rows)
-					_1: c4 <= 8'd65;
-					_2: c4 <= 8'd66;
-					_3: c4 <= 8'd67;
-					_4: c4 <= 8'd68;
-					default: c4 <= 0;
-				endcase
-				cols <= _1;
-			end
-			default:begin
-				cols <= _1;
-			end
-		endcase
-		
-		if(c1 != 0 && c2 == 0 && c3 == 0 && c4 == 0) out <= c1;
-		else if(c1 == 0 && c2 != 0 && c3 == 0 && c4 == 0) out <= c2;
-		else if(c1 == 0 && c2 == 0 && c3 != 0 && c4 == 0) out <= c3;
-		else if(c1 == 0 && c2 == 0 && c3 == 0 && c4 != 0) out <= c4;
-		else out <= 0;
-	end
+    output reg [3:0] cols,
+    input wire [3:0] rows,
+    input wire clk,
+    output reg [7:0] out,
+    output reg key_ready,   // Indicates a new key is available
+    input wire key_read     // Main module asserts this signal after reading the key
+);
+
+    // Parameters for column selection
+    parameter _1 = 4'b1000;
+    parameter _2 = 4'b0100;
+    parameter _3 = 4'b0010;
+    parameter _4 = 4'b0001;
+
+    reg [7:0] key_code;
+    reg [1:0] col_index; // Index to cycle through columns
+
+    initial begin
+        cols <= _1;
+        out <= 0;
+        key_ready <= 0;
+        key_code <= 0;
+        col_index <= 0;
+    end
+
+    always @(posedge clk) begin
+        // Reset key_code at each clock cycle
+        key_code <= 0;
+
+        // Scanning logic to detect key press
+        case (cols)
+            _1: begin
+                if (rows[0]) key_code <= 8'd49; // '1'
+                else if (rows[1]) key_code <= 8'd52; // '4'
+                else if (rows[2]) key_code <= 8'd55; // '7'
+                else if (rows[3]) key_code <= 8'd42; // '*'
+            end
+            _2: begin
+                if (rows[0]) key_code <= 8'd50; // '2'
+                else if (rows[1]) key_code <= 8'd53; // '5'
+                else if (rows[2]) key_code <= 8'd56; // '8'
+                else if (rows[3]) key_code <= 8'd48; // '0'
+            end
+            _3: begin
+                if (rows[0]) key_code <= 8'd51; // '3'
+                else if (rows[1]) key_code <= 8'd54; // '6'
+                else if (rows[2]) key_code <= 8'd57; // '9'
+                else if (rows[3]) key_code <= 8'd35; // '#'
+            end
+            _4: begin
+                if (rows[0]) key_code <= 8'd65; // 'A'
+                else if (rows[1]) key_code <= 8'd66; // 'B'
+                else if (rows[2]) key_code <= 8'd67; // 'C'
+                else if (rows[3]) key_code <= 8'd68; // 'D'
+            end
+            default: ;
+        endcase
+
+        // Rotate columns for scanning
+        case (cols)
+            _1: cols <= _2;
+            _2: cols <= _3;
+            _3: cols <= _4;
+            _4: cols <= _1;
+            default: cols <= _1;
+        endcase
+
+        // Handshaking logic
+        if (key_code != 0 && !key_ready) begin
+            out <= key_code;
+            key_ready <= 1;
+        end else if (key_read) begin
+            // Main module has read the key
+            out <= 0;
+            key_ready <= 0;
+        end
+    end
 endmodule
