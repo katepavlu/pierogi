@@ -6,7 +6,7 @@ JedecChain;
 	P ActionCode(Ign)
 		Device PartName(SOCVHPS) MfrSpec(OpMask(0));
 	P ActionCode(Cfg)
-		Device PartName(5CSEMA5F31) Path("/home/kat/Documents/GitHub/pierogi/Modules/Peripherals/output_files/") File("peripherals.sof") MfrSpec(OpMask(1));
+		Device PartName(5CSEMA5F31) Path("C:/Users/Theoni/Documents/GitHub/pierogi/Modules/Peripherals1/output_files/") File("peripherals.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 

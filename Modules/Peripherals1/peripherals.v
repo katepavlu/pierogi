@@ -58,15 +58,15 @@ module peripherals(
 	);
 	
 	keypad_peripheral kp0(
-		.cols(GPIO_1[35:32]),
-		.rows(GPIO_1[31:28]),
+		.cols(GPIO_1[33:30]),
+		.rows(GPIO_1[29:26]),
 		.clk(clkd),
-		.out(data_out)
+		.filtered_out(data_out)
 	);
 	
 	ClockDivider ckd0(
 		.clk(CLOCK_50),
-		.clkd(clkd),
+		.clkd(clkd)
 	);
 	
 /*	// a simple dummy program
