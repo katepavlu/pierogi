@@ -42,7 +42,8 @@ pub fn div(left:i32, right:i32) -> i32 {
     let sign_r = right & Wrapping(0x8000_0000);
 
     if right == Wrapping(0) {
-        return 0x7fff_ffff;
+        left = Wrapping(0x7fff_ffff);
+        right = Wrapping(1);
     }
 
     if sign_l != Wrapping(0) {
@@ -61,7 +62,7 @@ pub fn div(left:i32, right:i32) -> i32 {
         q = q<<1;
         r |= left >> 31;
         left = left << 1;
-        if right <= r {
+        if right < r+Wrapping(1) {
             r = r - right;
             q |= 1;
         }
