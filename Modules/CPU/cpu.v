@@ -1,30 +1,38 @@
 module cpu(
-   input clk,
-   input rst,
-	output reg clk0, clk2,
-   output reg [31:0] instruction,
-   output [31:0] Ra_rf, Rb_rf,
-   output reg [31:0] pc,
-   output M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq,
-   output [3:0] ALU,
-   output [31:0] mux5_out0, mux4_out0, mux6_out, mux7_out
+    input clk, // 50 MHz
+    input rst,
+    output wire clk0, clk2,
+    output reg [31:0] instruction, address,
+    output [31:0] Ra_rf, Rb_rf,
+    output reg [31:0] pc,
+    output M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq,
+    output [3:0] ALU,
+    output [31:0] mux5_out0, mux4_out0, mux7_out
 );
 
-reg locked;
-pll pll_inst (
-		.refclk   (clk),   //  refclk.clk
-		.rst      (rst),      //   reset.reset
-		.outclk_0 (clk0), // outclk0.clk
-		.outclk_1 (clk2), // outclk1.clk
-		.locked   (locked)    //  locked.export
-	);
-	
+wire locked;
+
+// Assign clk0 to clk
+assign clk0 = clk;
+
+// Internal clock divider for clk2
+reg clk2_internal = 0;
+
+always @(posedge clk or negedge rst) begin
+    if (!rst)
+        clk2_internal <= 0;
+    else
+        clk2_internal <= ~clk2_internal;  // Toggle clk2 on each clk rising edge
+end
+
+assign clk2 = clk2_internal;
+
+assign clk2 = clk2_internal;
 
 // Memory unit
-reg [31:0] address;
 wire [31:0] memory_out;
 
-// Initialize opcode, registers.
+// Initialize opcode, registers
 wire [3:0] opcode, Ra, Rb, Rd;
 wire [15:0] imm;
 wire [31:0] extended_imm;
@@ -37,16 +45,15 @@ assign Rb = instruction[19:16];
 assign imm = instruction[15:0];
 
 // Mux outputs
-wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out;
+wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out, mux6_out;
 
 // Declare outputs for mux4 and mux5
 wire [31:0] mux4_out1, mux5_out1;
 
 always @(posedge clk0) begin
-    if (clk2) begin
         address = pc;
-		  instruction = memory_out;
-		  end else 
+        instruction = memory_out;
+    if (M7==0) 
         address = mux4_out0;
 end
 
@@ -158,12 +165,12 @@ ALU alu (
 );
 
 BRAM ram(
-		.addr(address),
-		.din(mux5_out0),
-		.clk(clk0),
-		.wren(Wr_en),
-		.dout(memory_out)
-	);
+    .addr(address),
+    .din(mux5_out0),
+    .clk(clk0),
+    .wren(Wr_en),
+    .dout(memory_out)
+);
 
 // Always block to update 'pc'
 always @(negedge clk2 or negedge rst) begin
