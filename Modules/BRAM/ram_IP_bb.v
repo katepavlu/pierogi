@@ -1,10 +1,10 @@
-// megafunction wizard: %RAM: 1-PORT%VBB%
+// megafunction wizard: %RAM: 1-PORT%
 // GENERATION: STANDARD
 // VERSION: WM1.0
 // MODULE: altsyncram 
 
 // ============================================================
-// File Name: ram_IP.v
+// File Name: ram_IP_bb.v
 // Megafunction Name(s):
 // 			altsyncram
 //
@@ -16,6 +16,7 @@
 //
 // 23.1std.1 Build 993 05/14/2024 SC Lite Edition
 // ************************************************************
+
 
 //Copyright (C) 2024  Intel Corporation. All rights reserved.
 //Your use of Intel Corporation's design tools, logic functions 
@@ -32,7 +33,11 @@
 //refer to the applicable agreement for further details, at
 //https://fpgasoftware.intel.com/eula.
 
-module ram_IP (
+
+// synopsys translate_off
+`timescale 1 ps / 1 ps
+// synopsys translate_on
+module ram_IP_bb (
 	address,
 	clock,
 	data,
@@ -51,6 +56,56 @@ module ram_IP (
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_on
 `endif
+
+	wire [31:0] sub_wire0;
+	wire [31:0] q = sub_wire0[31:0];
+
+	altsyncram	altsyncram_component (
+				.address_a (address),
+				.clock0 (clock),
+				.data_a (data),
+				.wren_a (wren),
+				.q_a (sub_wire0),
+				.aclr0 (1'b0),
+				.aclr1 (1'b0),
+				.address_b (1'b1),
+				.addressstall_a (1'b0),
+				.addressstall_b (1'b0),
+				.byteena_a (1'b1),
+				.byteena_b (1'b1),
+				.clock1 (1'b1),
+				.clocken0 (1'b1),
+				.clocken1 (1'b1),
+				.clocken2 (1'b1),
+				.clocken3 (1'b1),
+				.data_b (1'b1),
+				.eccstatus (),
+				.q_b (),
+				.rden_a (1'b1),
+				.rden_b (1'b1),
+				.wren_b (1'b0));
+	defparam
+		altsyncram_component.clock_enable_input_a = "BYPASS",
+		altsyncram_component.clock_enable_output_a = "BYPASS",
+`ifdef NO_PLI
+		altsyncram_component.init_file = "a.rif"
+`else
+		altsyncram_component.init_file = "a.hex"
+`endif
+,
+		altsyncram_component.intended_device_family = "Cyclone V",
+		altsyncram_component.lpm_hint = "ENABLE_RUNTIME_MOD=NO",
+		altsyncram_component.lpm_type = "altsyncram",
+		altsyncram_component.numwords_a = 2048,
+		altsyncram_component.operation_mode = "SINGLE_PORT",
+		altsyncram_component.outdata_aclr_a = "NONE",
+		altsyncram_component.outdata_reg_a = "UNREGISTERED",
+		altsyncram_component.power_up_uninitialized = "FALSE",
+		altsyncram_component.read_during_write_mode_port_a = "DONT_CARE",
+		altsyncram_component.widthad_a = 11,
+		altsyncram_component.width_a = 32,
+		altsyncram_component.width_byteena_a = 1;
+
 
 endmodule
 
@@ -116,10 +171,10 @@ endmodule
 // Retrieval info: CONNECT: @data_a 0 0 32 0 data 0 0 32 0
 // Retrieval info: CONNECT: @wren_a 0 0 0 0 wren 0 0 0 0
 // Retrieval info: CONNECT: q 0 0 32 0 @q_a 0 0 32 0
-// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP.v TRUE
-// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP.inc FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP.cmp FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP.bsf FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP_inst.v FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP_bb.v TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP_bb.inc FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP_bb.cmp FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP_bb.bsf FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP_bb_inst.v FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL ram_IP_bb_bb.v TRUE
 // Retrieval info: LIB_FILE: altera_mf
