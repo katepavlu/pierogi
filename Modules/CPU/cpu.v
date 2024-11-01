@@ -16,18 +16,23 @@ wire locked;
 assign clk0 = clk;
 
 // Internal clock divider for clk2
+reg [1:0] clk2_counter = 0;
 reg clk2_internal = 0;
 
 always @(posedge clk or negedge rst) begin
-    if (!rst)
+    if (!rst) begin
+        clk2_counter <= 0;
         clk2_internal <= 0;
-    else
-        clk2_internal <= ~clk2_internal;  // Toggle clk2 on each clk rising edge
+    end else if (clk2_counter == 2) begin
+        clk2_counter <= 0;
+        clk2_internal <= ~clk2_internal;  // Toggle clk2 every third rising edge
+    end else begin
+        clk2_counter <= clk2_counter + 1;
+    end
 end
 
 assign clk2 = clk2_internal;
 
-assign clk2 = clk2_internal;
 
 // Memory unit
 wire [31:0] memory_out;
@@ -51,10 +56,12 @@ wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out, mux6_out;
 wire [31:0] mux4_out1, mux5_out1;
 
 always @(posedge clk0) begin
-        address = pc;
-        instruction = memory_out;
     if (M7==0) 
         address = mux4_out0;
+	else begin
+		  address = pc;
+        instruction = memory_out;
+		  end
 end
 
 // Initialize pc
@@ -64,6 +71,15 @@ end
 
 // Equality check
 assign Eq = (Ra_rf == Rb_rf) ? 1'b1 : 1'b0;
+
+
+// Always block to update 'pc'
+always @(negedge clk2 or negedge rst) begin
+    if (!rst)
+        pc <= 32'b0;
+    else
+        pc <= mux1_out;
+end
 
 // Adder instance
 adder add (
@@ -164,20 +180,18 @@ ALU alu (
     .outBus(ALU_out)
 );
 
-BRAM ram(
-    .addr(address),
-    .din(mux5_out0),
+// Memory instantiate
+memory_integrated mem(
+    .dataInVirt(mux5_out0),
+    .addressVirt(address),
+    .wEnVirt(Wr_en),
+    .rstVirt(rst),
     .clk(clk0),
-    .wren(Wr_en),
-    .dout(memory_out)
+    .dataOutVirt(memory_out)
 );
 
-// Always block to update 'pc'
-always @(negedge clk2 or negedge rst) begin
-    if (!rst)
-        pc <= 32'b0;
-    else
-        pc <= mux1_out;
-end
+   
+
+
 
 endmodule
