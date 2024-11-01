@@ -40,13 +40,13 @@ module Memory_controller(
 	input wire wEnVirt;
 	input wire rstVirt;
 		
-	output reg [PHYS_ADDR_BITS-1:0]addressPhys;
+	output reg [10:0]addressPhys;
 	output reg [31:0] dataInPhys;
 	input wire [31:0] dataOutPhys;
 	output reg wEnPhys;
 	output wire rstPhys;
 	
-	output reg [IO_ADDR_BITS-1:0]addressIO;
+	output reg [3:0]addressIO;
 	output reg [31:0] dataInIO;
 	input wire [31:0] dataOutIO;
 	output reg wEnIO;

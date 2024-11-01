@@ -19,7 +19,7 @@ module control(
     M4 = 1'b0;
     M5 = 1'b0;
     M6 = 1'b0;
-    M7 = 1'b0;
+    M7 = 1'b1;
     ALU = 4'b0000;
     Wr_en = 1'b0;
 end
