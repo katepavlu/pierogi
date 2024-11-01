@@ -1,129 +1,114 @@
+mod arithmetic;
+
+use std::io;
+
 fn main() {
-    println!("Hello, world!");
-}
+    let mut input1;
+    let mut input2;
+    let mut op1;
+    let mut op2;
+    loop{
 
+        (input1,op1) = read_multidigit();
 
-
-
-fn poll_keyboard() -> char {
-    let  key = '1';
-
-    key
-}
-
-// simple one instruction operation
-fn add(left:i32, right:i32) -> i32 {
-    left + right
-}
-
-// simple one instruction operation
-fn sub(left:i32, right:i32) -> i32 {
-    left - right
-}
-
-/// Booth's algorithm
-fn mult(mut left:i32, mut right:i32) -> i32 {
-
-    let mut accumulator:i64 = 0;
-
-    if (left & 1) as u32 > 0 {
-        accumulator -= right as i64
-    }
-
-    let mut index = 32;
-    while index > 0 {
-        right = right << 1;
-
-        if (left & 3) == 1 {
-            accumulator += right as i64; 
-        }
-        if (left & 3) == 2 {
-            accumulator -= right as i64;
+        if op1 == 0x2a { //clear
+            println!("out: 0");
+            continue;
         }
 
-        index -= 1;
-        left = left >> 1;
-    }
+        loop {
 
-    accumulator as i32
-}
+            (input2,op2) = read_multidigit();
 
-/// long division https://en.wikipedia.org/wiki/Division_algorithm
-fn div(mut left:i32, mut right:i32) -> i32 {
-    let sign_l = left as u32 & 0x8000_0000;
-    let sign_r = right as u32 & 0x8000_0000;
+            if op1 == 0x41 { //plus
+                input1 = input1 + input2;
+            }
+            if op1 == 0x42 { //minus
+                input1 = input1 - input2;
+            }
+            if op1 == 0x43 { //mul
+                input1 = arithmetic::mult(input1, input2);
+            }
+            if op1 == 0x44 { //div
+                input1 = arithmetic::div(input1, input2);
+            }
 
-    if right == 0 {
-        return 0x7fff_ffff;
-    }
+            println!("out: {}", input1);
 
-    if sign_l > 0 {
-        left = -left;
-    }
-    if sign_r > 0 {
-        right = -right;
-    }
-    let sign_out = sign_l ^ sign_r;
+            if op2 == 0x23 { // equals
+                (_, op2) = read_multidigit();
+            }
 
-    let mut q= 0;
-    let mut r = 0;
-    let mut i = 32;
-    while i != 0 {
-        r = r<<1;
-        q = q<<1;
-        r |= (left as u32 >> 31) as i32;
-        left = left << 1;
-        println!("r: {r} q: {q} left: {left} right: {right}");
-        if right as u32 <= r as u32 {
-            r = r - right;
-            q |= 1;
+            if op2 == 0x2a { //clear
+                println!("out: 0");
+                break;
+            }
+
+            op1 = op2;
         }
-        i -= 1;  
     }
-
-    if sign_out > 0 {
-       q = -q;
-    }
-    q
 }
 
-#[cfg(test)]
-mod tests {
+// reads a decimal multidigit number
+fn read_multidigit() -> (i32, i32) {
+    let mut num = 0;
+    let mut c;
 
-    #[test]
-    fn add() {
-        assert_eq!(super::add(5, 5), 10);
-        assert_eq!(super::add(5, -5), 0);
+    loop {
+        c = read_keyb_detector();
+        if (c < 0x3a) && (0x2f < c )
+        {
+            num = arithmetic::mult(num, 10);
+    
+            num += (c - 0x30) as i32;
+
+            println!("num: {}", num); 
+            // this represents printing to the screen
+        }
+        else {
+            break;
+        }
+
+    }
+    (num, c)
+}
+
+// polls keyboard until a rising edge is found
+fn read_keyb_detector() -> i32 {
+
+    loop {
+        if read_single_num() == 0 {
+            break;
+        }
+    }
+    let mut num;
+
+    loop {
+        num = read_single_num();
+        if num != 0 {
+            break;
+        }
     }
 
-    #[test]
-    fn sub() {
-        assert_eq!(super::sub(5, 5), 0);
-        assert_eq!(super::sub(5, -5), 10);
-    }
+    num
+}
 
-    #[test]
-    fn mult() {
-        assert_eq!(super::mult(4, 5), 20);
-        assert_eq!(super::mult(4, -5), -20);
-        assert_eq!(super::mult(-4, 5), -20);
-        assert_eq!(super::mult(-4, -5), 20);
+/// emulates reading from the keyboard status register
+fn read_single_num() -> i32 {
 
-        assert_eq!(super::mult(0x7fff_ffff, 1), 0x7fff_ffff);
-        assert_eq!(super::mult(-0x8000_0000, 1), -0x8000_0000);
-    }
+    let mut input = String::new();
 
-    #[test]
-    fn div() {
-        assert_eq!(super::div(5, 4), 1);
-        assert_eq!(super::div(5, -4), -1);
-        assert_eq!(super::div(-5, 4), -1);
-        assert_eq!(super::div(-5, -4), 1);
-        assert_eq!(super::div(0x800, 16), 0x80);
+    io::stdin()
+        .read_line(&mut input)
+        .expect("line read error");
 
-        assert_eq!(super::div(0x7fff_ffff, 1), 0x7fff_ffff);
-        assert_eq!(super::div(-0x7fff_ffff, 1), -0x7fff_ffff);
+    input.pop(); // cho off the \n
 
-        assert_eq!(super::div(0x7fff_ffff, 16), 0x07ff_ffff);
-    }
+    let parsed = match i32::from_str_radix(&input, 16) {
+        Ok(i) => i,
+        _ => 0,
+    };
+
+    parsed
+   
 }
