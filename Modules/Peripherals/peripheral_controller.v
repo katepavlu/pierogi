@@ -63,7 +63,7 @@ module peripheral_controller(
 		.cols(cols),             // Connect the columns to cols
 		.rows(rows),             // Connect rows to the keypad peripheral's row outputs
 		.clk(clk),               // Use clk for the keypad peripheral clock
-		.out(keyboard_dout)      // Connect keyboard_dout to get the keypad output
+		.filtered_out(keyboard_dout)      // Connect keyboard_dout to get the keypad output
 	);
 
 endmodule

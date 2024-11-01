@@ -4,29 +4,17 @@ module peripheral_controller_tb;
 
     // Testbench signals
     reg clk;
-    reg reset;
     reg [3:0] address;
-    reg [7:0] din;
+    reg din;
     reg writeEnable;
-    wire [7:0] dout;
-
-    wire [6:0] hex0;
-    wire [6:0] hex1;
-    wire [6:0] hex2;
-    wire [6:0] hex3;
-    wire [6:0] hex4;
-    wire [6:0] hex5;
-    wire [6:0] hex6;
-    wire [6:0] hex7;
-    wire [6:0] hex8;
-    wire [6:0] hex9;
-    wire [6:0] hex10;
+    reg [3:0] cols;        // Simulate keypad column inputs
+    
+    wire [6:0] hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7, hex8, hex9, hex10;
     wire dot;
+    wire [3:0] rows;       // Keypad row outputs
+    wire dout;
 
-    wire [3:0] cols;
-    reg [3:0] rows;
-
-    // Instantiate the peripheral controller
+    // Instantiate the peripheral_controller
     peripheral_controller uut (
         .hex0(hex0),
         .hex1(hex1),
@@ -40,10 +28,9 @@ module peripheral_controller_tb;
         .hex9(hex9),
         .hex10(hex10),
         .dot(dot),
-        .cols(cols),
         .rows(rows),
+        .cols(cols),
         .clk(clk),
-        .reset(reset),
         .address(address),
         .din(din),
         .writeEnable(writeEnable),
@@ -53,55 +40,58 @@ module peripheral_controller_tb;
     // Clock generation
     initial begin
         clk = 0;
-        forever #5 clk = ~clk;  // 10 ns clock period
+        forever #5 clk = ~clk;  // 10 ns clock period (100 MHz)
     end
 
-    // Test sequence
+    // Test procedure
     initial begin
         // Initialize inputs
-        reset = 1;
-        address = 4'h0;
-        din = 8'd0;
+        address = 4'b0000;
+        din = 0;
         writeEnable = 0;
-        rows = 4'b0000;
-
-        // Wait for reset to be processed
-        #20;
-        reset = 0;
-
-        // Simulate a key press on the keypad
-        // Assume the user presses the '2' key
-        // '2' key is detected when cols[3] is active and rows[0] is pressed
-        // Since cols are controlled by the keypad peripheral, we need to synchronize with it
-        // For simplicity, we'll wait some time and then set rows[0] high
-        #100;
-        rows = 4'b0001;  // Simulate pressing '2' key
-
-        // Wait for the peripheral to process the key press
-        #100;
-
-        // Read data from the keypad by setting address to 0
-        address = 4'h0;
+        cols = 4'b0000;
+        
+        // Wait for global reset
         #10;
-        $display("Read dout: %d (ASCII code)", dout);
+        
+        // Test 1: Read Operation (address = 0)
+        // Expect dout to reflect the value of keyboard_dout
+        address = 4'h0;
+        cols = 4'b1010;     // Set keypad column input to simulate a key press
+        #10;
+        
+        $display("Test 1: Read Operation - address 0");
+        if (dout === uut.keyboard_dout)
+            $display("PASS: dout matches keyboard_dout");
+        else
+            $display("FAIL: dout does not match keyboard_dout");
 
-        // Release the key press
-        rows = 4'b0000;
-
-        // Wait some time
-        #50;
-
-        // Write data to the display
+        // Test 2: Write Operation (address = 4, writeEnable = 1)
+        // Expect display_din to reflect din and be used by display_peripheral
         address = 4'h4;
-        din = 8'd65;       // ASCII code for 'A'
+        din = 1'b1;
         writeEnable = 1;
         #10;
+
+        $display("Test 2: Write Operation - address 4, writeEnable 1");
+        if (uut.display_din === din)
+            $display("PASS: display_din matches din");
+        else
+            $display("FAIL: display_din does not match din");
+
+        // Test 3: Write Operation without writeEnable (address = 4, writeEnable = 0)
+        // Expect display_din to NOT update
+        din = 1'b0;
         writeEnable = 0;
+        #10;
 
-        // Wait to observe the display outputs
-        #100;
+        $display("Test 3: Write Operation without writeEnable - address 4, writeEnable 0");
+        if (uut.display_din !== din)
+            $display("PASS: display_din did not update when writeEnable is 0");
+        else
+            $display("FAIL: display_din updated when writeEnable is 0");
 
-        // Finish simulation
+        // Test complete
         $stop;
     end
 
