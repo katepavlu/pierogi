@@ -1,6 +1,6 @@
 // hex_driver module
 module hex_driver(
-    input [31:0] din, 
+    input [3:0] din, 
     output reg [6:0] LEDpins
 );
     // 7-segment encoding for each hexadecimal digit
@@ -90,9 +90,10 @@ module display_peripheral(
         .LEDpins(hex9)
     );
 
-    // Handle the sign bit in hex10
-    // If din is negative, hex10 will have a '-' symbol, otherwise it's blank
-    assign hex10 = (din < 0) ? ~7'b0000001 : ~7'b0000000;  // '-' symbol if negative, blank otherwise
+   assign hex10[4:0] = -1;
+	assign hex10[5] = ~(din<0);
+	assign hex10[6] = 1;
+	
     
     // Set dot to 1 (off) for simplicity; modify if you want a specific behavior
     assign dot = 1;

@@ -17,7 +17,7 @@ module peripheral_controller(
 	
 	input wire clk,
 	input wire [3:0] address,
-	input wire din,
+	input wire [31:0] din,
 	input wire writeEnable,
 	output reg [7:0] dout
 );
