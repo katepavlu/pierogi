@@ -61,4 +61,5 @@ module peripheral_controller(
 		.clk(clk),
 		.out(keyboard_dout)
 	);
+	
 endmodule

@@ -322,7 +322,7 @@ set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH peripheral_controller_tb -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH tb_dummy_peripheral_controller -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME keypad_tb -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id keypad_tb
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME keypad_tb -section_id keypad_tb
@@ -335,7 +335,13 @@ set_global_assignment -name VERILOG_FILE tb_keypad_peripheral.v
 set_global_assignment -name EDA_TEST_BENCH_NAME tb_keypad_peripheral -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id tb_keypad_peripheral
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME tb_keypad_peripheral -section_id tb_keypad_peripheral
+set_global_assignment -name VERILOG_FILE dummy_keypad.v
+set_global_assignment -name VERILOG_FILE tb_dummy_peripheral_controller.v
 set_global_assignment -name EDA_TEST_BENCH_FILE keypad_tb.v -section_id keypad_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE peripheral_controller_tb.v -section_id peripheral_controller_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE tb_keypad_peripheral.v -section_id tb_keypad_peripheral
+set_global_assignment -name EDA_TEST_BENCH_NAME tb_dummy_peripheral_controller -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id tb_dummy_peripheral_controller
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME tb_dummy_peripheral_controller -section_id tb_dummy_peripheral_controller
+set_global_assignment -name EDA_TEST_BENCH_FILE tb_dummy_peripheral_controller.v -section_id tb_dummy_peripheral_controller
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

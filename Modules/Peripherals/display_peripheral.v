@@ -1,6 +1,6 @@
 // hex_driver module
 module hex_driver(
-    input [3:0] din, 
+    input [31:0] din, 
     output reg [6:0] LEDpins
 );
     // 7-segment encoding for each hexadecimal digit

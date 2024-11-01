@@ -19,23 +19,24 @@ module peripheral_controller(
 	input wire [3:0] address,
 	input wire din,
 	input wire writeEnable,
-	output reg dout
+	output reg [7:0] dout
 );
-
-	reg display_din;           // Internal register to hold display data
-	wire keyboard_dout;        // Output from the keypad_peripheral module
+ 
+	reg [31:0] display_din;           
+	wire [7:0] keyboard_dout;        
+   wire [7:0] dummy_filtered_out;
 	
-	// Use an always block to control the dout and display_din based on address
+	
 	always @(posedge clk) begin
 		dout = 0;  // Default dout to 0 unless overridden
 		
 		case (address)
 			4'h0: begin
-				// Read operation: output keyboard_dout when address is 0
-				dout = keyboard_dout;
+				
+				dout =  dummy_filtered_out;
 			end
 			4'h4: begin
-				// Write operation: update display_din when address is 4 and writeEnable is high
+				
 				if (writeEnable) 
 					display_din = din;
 			end
@@ -66,4 +67,12 @@ module peripheral_controller(
 		.filtered_out(keyboard_dout)      // Connect keyboard_dout to get the keypad output
 	);
 
+    // Instantiate dummy_keypad module
+    dummy_keypad u_dummy_keypad (
+        .clk(clk),                  // Connect clk input
+        .dummy_out(dummy_filtered_out) // Connect filtered_out output
+    );
+
+
+	
 endmodule
