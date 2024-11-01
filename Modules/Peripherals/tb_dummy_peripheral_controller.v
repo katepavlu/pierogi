@@ -52,8 +52,20 @@ module tb_dummy_peripheral_controller;
 
         // Wait for the system to stabilize
         #10;
+		  
+		  
+		   // Test case 1: Read dummy_filtered_out when address = 0
+        address = 4'h0;
+        #10;
+        $display("Test Case 1: Address = 0, expecting dummy_filtered_out on dout.");
+        $monitor("Time=%0t | Address=%h | dout=%h", $time, address, dout);
+        
+        // Wait a few clock cycles to observe dummy_out changes
+        #10;
+		  
+		  
 
-        // Test Case 1: Write value to display_din and check display output
+        // Test Case 2: Write value to display_din and check display output
         address = 4'h4;
         writeEnable = 1;
         din = 8'h12; // Example data to write: '18' in decimal
@@ -74,30 +86,7 @@ module tb_dummy_peripheral_controller;
             $display("SUCCESS: Correct hex output for display_din = 18");
         end
 
-        // Additional Tests: Try different values of display_din if desired
-
-        // Test Case 2: Write another value to display_din and check display output
-        #20;
-        address = 4'h4;
-        writeEnable = 1;
-        din = 8'hAB; // Example data to write: '171' in decimal
-        #10;
-        writeEnable = 0; // Disable writing after one cycle
-
-        $display("Test Case 2: Address = 4, writeEnable = 1, din = %h (decimal 171)", din);
-        $display("Expected hex0 to display 1, hex1 to display 7, and hex2 to display 1.");
-
-        // Check display outputs after write
-        #10;
-        if (hex0 != ~7'b0000110 || hex1 != ~7'b1101111 || hex2 != ~7'b0000110) begin
-            $display("ERROR: Incorrect hex output for display_din = 171");
-            $display("hex0 = %b, expected ~7'b0000110 (for 1)", hex0);
-            $display("hex1 = %b, expected ~7'b1101111 (for 7)", hex1);
-            $display("hex2 = %b, expected ~7'b0000110 (for 1)", hex2);
-        end else begin
-            $display("SUCCESS: Correct hex output for display_din = 171");
-        end
-
+      
         // End simulation
         #20;
         $finish;

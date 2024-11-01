@@ -64,7 +64,7 @@ module peripherals(
 		.hex10(HEX10),
 		.dot(GPIO_0[35]),
 		.rows(GPIO_1[29:26]),
-		.cols(GPIO_1[33:30]),  // Assuming GPIO_1[35:32] are the keypad columns
+		.cols(GPIO_1[33:30]),  
 		.clk(clkd),
 		.address(address),
 		.din(din),
@@ -80,15 +80,5 @@ module peripherals(
 
 
 
-	/* Optional dummy program - Uncomment to use for testing
-	reg signed [31:0] data_out;
-	initial begin
-		data_out <= 32'h7fff_fff0;
-	end
-	
-	always @(posedge KEY[0]) begin
-		data_out <= data_out + 1;
-	end
-	*/
 
 endmodule

@@ -23,7 +23,8 @@ module peripheral_controller(
 );
  
 	reg [31:0] display_din;           
-	wire [7:0] keyboard_dout;        
+	wire [7:0] keyboard_dout;  
+	//dummy
    wire [7:0] dummy_filtered_out;
 	
 	
@@ -32,7 +33,7 @@ module peripheral_controller(
 		
 		case (address)
 			4'h0: begin
-				
+				//replace dummy with keyboard_dout, if you are done simulating
 				dout =  dummy_filtered_out;
 			end
 			4'h4: begin
@@ -45,7 +46,7 @@ module peripheral_controller(
 	
 	// Instantiate the display and keypad peripherals
 	display_peripheral dp0(
-		.din(display_din),       // Connect display_din to the display module input
+		.din(display_din),       
 		.hex0(hex0),
 		.hex1(hex1),
 		.hex2(hex2),
@@ -61,16 +62,16 @@ module peripheral_controller(
 	);
 	
 	keypad_peripheral kp0(
-		.cols(cols),             // Connect the columns to cols
-		.rows(rows),             // Connect rows to the keypad peripheral's row outputs
-		.clk(clk),               // Use clk for the keypad peripheral clock
-		.filtered_out(keyboard_dout)      // Connect keyboard_dout to get the keypad output
+		.cols(cols),             
+		.rows(rows),           
+		.clk(clk),              
+		.filtered_out(keyboard_dout)      
 	);
 
-    // Instantiate dummy_keypad module
+    // dummy_keypad module
     dummy_keypad u_dummy_keypad (
-        .clk(clk),                  // Connect clk input
-        .dummy_out(dummy_filtered_out) // Connect filtered_out output
+        .clk(clk),                  
+        .dummy_out(dummy_filtered_out) 
     );
 
 
