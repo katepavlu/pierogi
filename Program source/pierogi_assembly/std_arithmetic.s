@@ -41,11 +41,12 @@ mult: # left is in $a0, right is in $a1
     beq $zero, $zero, loop_start_0F9F2D92C2583EF952556E1F382D0974
     loop_end_0F9F2D92C2583EF952556E1F382D0974:
 
-    j $ra, $zero
+    # return acc
+    j $zero, $ra
 
 # signed division
 div: # left is in $a0, right is in $a1
-    la $t0, 0x80000000
+    lui $t0, 0x8000
     and $t1, $t0, $a0 # sign_l = left & 0x80000000
     and $t2, $t0, $a1 # sign_r = right & 0x80000000
 
@@ -100,5 +101,5 @@ div: # left is in $a0, right is in $a1
         sub $v, $zero, $v #q = -q
     sign_is_positive_38696558DC98494C08D951C052900A2A:
 
-
-    j $ra, $zero
+    # return q
+    j $zero, $ra
