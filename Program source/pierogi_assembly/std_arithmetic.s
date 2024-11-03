@@ -1,4 +1,4 @@
-# standard arithmetic library by Kat Pavu
+# standard arithmetic library by Kat Pavlu
 # internal labels have the md5 hash of the name of the function
 # appended to them to reduce the chance of collision with something
 # in your code
