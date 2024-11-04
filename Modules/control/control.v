@@ -13,6 +13,7 @@ module control(
     output reg pc_flag, 
     output reg instruction_flag,
     output reg change_address_flag,
+    output reg Wr_en_rf,
     output reg [1:0] state,
     output reg [3:0] ALU,
     output reg Wr_en
@@ -50,18 +51,20 @@ always @(*) begin
     Wr_en <= 0;
     pc_flag <= 0;
     instruction_flag <= 0;
+    Wr_en_rf <= 0;
     case (state)
         2'b00: begin
             change_address_flag <= 1;
             Wr_en <= 0;
             pc_flag <= 1;
+            Wr_en_rf <= 1;
             instruction_flag <= 0;
         end
         2'b01: begin
             change_address_flag <= 0;
             if (opcode == 4'b1111)
                 Wr_en <= 1;
-            
+            Wr_en_rf <= 0;
             pc_flag <= 0;
             instruction_flag <= 1;
         end
@@ -81,6 +84,14 @@ end
             M7 = 1'b1;
             ALU = 4'b0000;
         end else begin
+            M1 = 1'b0;
+            M2 = 1'b0;
+            M3 = 1'b0;
+            M4 = 1'b0;
+            M5 = 1'b0;
+            M6 = 1'b0;
+            M7 = 1'b1;
+            ALU = 4'b0000;
             case (opcode)
                 4'b0000: begin // and
                     M1 = 1'b0;

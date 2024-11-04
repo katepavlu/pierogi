@@ -4,13 +4,12 @@ module cpu_tb;
 
     // Testbench signals
     reg clk;
-    wire clk0, clk2;
     reg rst;
     wire [1:0] state;
     wire [31:0] instruction, address;
     wire [31:0] Ra_rf, Rb_rf;
     wire [31:0] pc;
-    wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq;
+    wire M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq, Wr_en_rf;
     wire [3:0] ALU;
     wire [31:0] mux5_out0, mux4_out0, mux7_out;
 
@@ -32,8 +31,7 @@ module cpu_tb;
         .rst(rst),
         .address(address),
         .instruction(instruction),
-        .Ra_rf(Ra_rf),
-        .Rb_rf(Rb_rf),
+        .Wr_en_rf(Wr_en_rf),
         .state(state),
         .pc(pc),
         .M1(M1),
@@ -49,16 +47,14 @@ module cpu_tb;
         .Wr_en(Wr_en),
         .Eq(Eq),
         .ALU(ALU),
-        .mux5_out0(mux5_out0),
-        .mux4_out0(mux4_out0),
         .mux7_out(mux7_out)
     );
 
     // Simulation control
     initial begin
         // Run the simulation for a certain period
-        #2500;
-        $finish;   // End the simulation after 2500 ns
+        #1500;
+        $stop;   // End the simulation after 2500 ns
     end
 
     // Monitor to observe changes

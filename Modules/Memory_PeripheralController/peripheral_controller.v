@@ -39,7 +39,7 @@ module peripheral_controller(
 			case (address)
 				4'h0: begin
 					// Replace dummy with keyboard_dout if you are done simulating
-					dout <= dummy_filtered_out;
+					dout <= keyboard_dout;
 				end
 				4'h4: begin
 					if (writeEnable) 
@@ -81,11 +81,12 @@ module peripheral_controller(
 		.clk(clkd),              
 		.filtered_out(keyboard_dout)
 	);
-
+/*
 	// dummy_keypad module
 	dummy_keypad u_dummy_keypad (
 		.clk(clkd),                  
 		.dummy_out(dummy_filtered_out)
 	);
+    */
 	
 endmodule

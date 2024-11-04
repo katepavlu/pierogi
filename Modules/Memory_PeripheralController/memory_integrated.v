@@ -8,9 +8,7 @@ module memory_integrated(
 	 
 	  // Outputs for peripheral_controller (Display outputs)
     output wire [6:0] hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7, hex8, hex9, hex10,
-    output wire dot,
-	 output wire [35:0] GPIO_0,
-	inout wire [35:0] GPIO_1,	
+    output wire dot,	
 	 
 	 // Keypad connections for peripheral_controller
     output wire [3:0] rows,
