@@ -19,7 +19,7 @@ module test_tb;
 
     // Clock generation
     initial begin
-        clk = 1;
+        clk =0;
         forever #5 clk = ~clk; // 100MHz clock
     end
 
