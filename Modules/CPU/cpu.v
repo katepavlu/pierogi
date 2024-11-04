@@ -11,23 +11,19 @@ module cpu(
 );
 
 wire locked;
+reg memory_instruction;
 
 // Assign clk0 to clk
 assign clk0 = clk;
 
 // Internal clock divider for clk2
-reg [1:0] clk2_counter = 0;
 reg clk2_internal = 0;
 
 always @(posedge clk or negedge rst) begin
     if (!rst) begin
-        clk2_counter <= 0;
         clk2_internal <= 0;
-    end else if (clk2_counter == 2) begin
-        clk2_counter <= 0;
-        clk2_internal <= ~clk2_internal;  // Toggle clk2 every third rising edge
     end else begin
-        clk2_counter <= clk2_counter + 1;
+        clk2_internal <= ~clk2_internal;  // Toggle clk2 every second rising edge
     end
 end
 
@@ -56,12 +52,11 @@ wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out, mux6_out;
 wire [31:0] mux4_out1, mux5_out1;
 
 always @(posedge clk0) begin
-    if (M7==0) 
+	memory_instruction = M7;
+	address = pc;
+    if (memory_instruction == 0 & clk2==0) 
         address = mux4_out0;
-	else begin
-		  address = pc;
-        instruction = memory_out;
-		  end
+		  memory_instruction = 1;
 end
 
 // Initialize pc
@@ -79,6 +74,7 @@ always @(negedge clk2 or negedge rst) begin
         pc <= 32'b0;
     else
         pc <= mux1_out;
+		  instruction = memory_out;
 end
 
 // Adder instance
@@ -102,6 +98,8 @@ register_file RF (
 
 // Control unit instance
 control ctrl (
+	 .clk0(clk0),
+	 .clk2(clk2),
     .opcode(opcode),
     .Eq(Eq),
     .M1(M1),

@@ -1,4 +1,5 @@
 module control(
+	input clk0, clk2,
 	input wire [3:0] opcode,
 	input wire Eq, 
 	output reg M1, 
@@ -23,7 +24,16 @@ module control(
     ALU = 4'b0000;
     Wr_en = 1'b0;
 end
-		
+	always @(posedge clk0) begin
+		case(opcode)
+			4'b1111: begin // sw
+				Wr_en = 1'b1;
+				if (clk2 ==1)
+					Wr_en = 1'b0;
+			end
+			default: Wr_en =1'b0;
+		endcase
+	end	
 	always @(opcode or Eq) begin
 		case (opcode)
 			4'b0000: begin // and
@@ -99,18 +109,15 @@ end
 				M1 = 1'b1;
 				M2 = 1'b1;
 				M3 = M1;
-				Wr_en = 1'b0;
 			end
 			4'b1000: begin // beq
 				M1 = 1'b0;
 				M2 = Eq;
-				Wr_en = 1'b0;
 				M3 = M1;
 			end
 			4'b1001: begin // bne
 				M1 = 1'b0;
 				M2 = ~Eq;
-				Wr_en = 1'b0;
 				M3 = M1;
 			end
 			4'b1010: begin // sl
@@ -157,13 +164,11 @@ end
 				M1 = 1'b0;
 				M2 = 1'b0;
 				M4 = 1'b0;
-				Wr_en = 1'b1;
 				M3 = M1;
 				M5 = M4;
 				M7 = M4;
 			end
 			4'b1111: begin // sw
-				Wr_en = 1'b1;
 				M1 = 1'b0;
 				M2 = 1'b0;
 				M4 = 1'b0;
@@ -171,6 +176,6 @@ end
 				M5 = M4;
 				M7 = M4;
 			end
-		endcase
+			endcase
 	end
 endmodule
