@@ -24,17 +24,17 @@ module peripheral_controller(
 );
  
 	reg [31:0] display_din;
-	wire [7:0] keyboard_dout;
+	wire [31:0] keyboard_dout;
 	// dummy signal
-	wire [7:0] dummy_filtered_out;
+	wire [31:0] dummy_filtered_out;
 	
 	always @(posedge clk) begin
 		if (reset) begin
 			// Reset internal registers to default values
-			dout <= 8'b0;
+			dout <= 32'b0;
 			display_din <= 32'b0;
 		end else begin
-			dout <= 8'b0;  // Default dout to 0 unless overridden
+			dout <= 32'b0;  // Default dout to 0 unless overridden
 			
 			case (address)
 				4'h0: begin

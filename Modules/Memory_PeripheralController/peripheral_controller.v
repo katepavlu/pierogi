@@ -20,21 +20,21 @@ module peripheral_controller(
 	input wire [3:0] address,
 	input wire [31:0] din,
 	input wire writeEnable,
-	output reg [7:0] dout
+	output reg [31:0] dout
 );
  
 	reg [31:0] display_din;
-	wire [7:0] keyboard_dout;
+	wire [31:0] keyboard_dout;
 	// dummy signal
-	wire [7:0] dummy_filtered_out;
+	wire [31:0] dummy_filtered_out;
 	
 	always @(posedge clk) begin
-		if (reset) begin
+		if (!reset) begin
 			// Reset internal registers to default values
-			dout <= 8'b0;
+			dout <= 32'b0;
 			display_din <= 32'b0;
 		end else begin
-			dout <= 8'b0;  // Default dout to 0 unless overridden
+			dout <= 32'b0;  // Default dout to 0 unless overridden
 			
 			case (address)
 				4'h0: begin
@@ -66,16 +66,25 @@ module peripheral_controller(
 		.dot(dot)
 	);
 	
+	 // Divided clock signal
+    wire clkd;
+	
+   // Instantiate Clock Divider
+   ClockDivider clk_div (
+        .clk(clk), 
+        .clkd(clkd)  // Output: divided clock signal
+    );
+	
 	keypad_peripheral kp0(
 		.cols(cols),             
 		.rows(rows),           
-		.clk(clk),              
+		.clk(clkd),              
 		.filtered_out(keyboard_dout)
 	);
 
 	// dummy_keypad module
 	dummy_keypad u_dummy_keypad (
-		.clk(clk),                  
+		.clk(clkd),                  
 		.dummy_out(dummy_filtered_out)
 	);
 	
