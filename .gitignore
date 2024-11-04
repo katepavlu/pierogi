@@ -13,7 +13,7 @@
 # *.sdc
 
 # ignore Quartus II generated folders
-*_sim
+#*_sim
 db
 greybox_tmp
 incremental_db

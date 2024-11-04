@@ -1,0 +1,31 @@
+
+
+/home/kat/Documents/GitHub/pierogi/Modules/CPU/pll.v
+
+Nov 04 07PM:59:06>: Megafunction PLL Intel FPGA IP v23.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+/home/kat/Documents/GitHub/pierogi/Modules/CPU/pll.v
+
+Nov 04 07PM:59:07>: Megafunction PLL Intel FPGA IP v23.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+/home/kat/Documents/GitHub/pierogi/Modules/CPU/pll.v
+
+Nov 04 08PM:02:06>: Megafunction PLL Intel FPGA IP v23.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+/home/kat/Documents/GitHub/pierogi/Modules/CPU/pll.v
+
+Nov 04 08PM:02:15>: Megafunction PLL Intel FPGA IP v23.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+/home/kat/Documents/GitHub/pierogi/Modules/CPU/pll.v
+
+Nov 04 08PM:02:22>: Megafunction PLL Intel FPGA IP v23.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted
+
+/home/kat/Documents/GitHub/pierogi/Modules/CPU/pll.v
+
+Nov 04 08PM:02:23>: Megafunction PLL Intel FPGA IP v23.1 is not listed in any 
+wizard.lst file in the specified library path(s).Wizard launch aborted

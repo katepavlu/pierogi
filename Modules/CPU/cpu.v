@@ -22,7 +22,7 @@ wire rst;
 assign rst = KEY[0];
 pll pll1 (
 		.refclk(CLOCK_50),   //  refclk.clk
-		.rst(rst),      //   reset.reset
+		.rst(!rst),      //   reset.reset
 		.outclk_0(clk)  // outclk0.clk
 	);
 

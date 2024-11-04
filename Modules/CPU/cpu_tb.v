@@ -16,7 +16,7 @@ module cpu_tb;
     // Clock generation
     initial begin
         clk = 0;
-        forever #10 clk = ~clk;  // Toggle clock every 10 ns (50 MHz clock)
+        forever #20 clk = ~clk;  // Toggle clock every 10 ns (50 MHz clock)
     end
 
     // Reset generation
@@ -26,28 +26,17 @@ module cpu_tb;
     end
 
     // Instantiate CPU
-    cpu uut (
-        .clk(clk),
-        .rst(rst),
-        .address(address),
-        .instruction(instruction),
-        .Wr_en_rf(Wr_en_rf),
-        .state(state),
-        .pc(pc),
-        .M1(M1),
-        .M2(M2),
-        .M3(M3),
-        .M4(M4),
-        .M5(M5),
-        .M6(M6),
-        .M7(M7),
-        .pc_flag(pc_flag),
-        .instruction_flag(instruction_flag),
-        .change_address_flag(change_address_flag),
-        .Wr_en(Wr_en),
-        .Eq(Eq),
-        .ALU(ALU),
-        .mux7_out(mux7_out)
+     cpu uut(
+    .CLOCK_50(clk), // 50 MHz
+    .KEY(rst),
+    .instruction(instruction), .address(address),
+    .pc(pc),
+    .state(state),
+    .M1(M1), .M2(M2), .M3(M3), .M4(M4), .M5(M5), .M6(M6), .M7(M7),
+    .Wr_en(Wr_en), .Eq(Eq), .pc_flag(pc_flag), .instruction_flag(instruction_flag),
+    .change_address_flag(change_address_flag), .Wr_en_rf(Wr_en_rf),
+    .ALU(ALU),
+    .mux7_out(mux7_out)   
     );
 
     // Simulation control
