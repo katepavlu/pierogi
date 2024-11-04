@@ -1,77 +1,114 @@
-`timescale 1ns/1ps
+`timescale 1ns / 1ps
 
-module test_tb;
+module test_tb();
 
+    // Declare inputs as reg type
     reg [31:0] dataInVirt;
     reg [31:0] addressVirt;
-    reg wEnVirt, rstVirt, clk;
-    wire [31:0] dataOutVirt;
+    reg wEnVirt;
+    reg rstVirt;
+    reg clk;
 
-    // Instantiate the Top module
+    // Declare outputs as wire type
+    wire [31:0] dataOutVirt;
+    wire [6:0] hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7, hex8, hex9, hex10;
+    wire dot;
+    wire [35:0] GPIO_0;
+    wire [3:0] rows;
+    reg [3:0] cols;
+
+    // Instantiate the memory_integrated module
     memory_integrated uut (
         .dataInVirt(dataInVirt),
         .addressVirt(addressVirt),
         .wEnVirt(wEnVirt),
         .rstVirt(rstVirt),
         .clk(clk),
-        .dataOutVirt(dataOutVirt)
+        .dataOutVirt(dataOutVirt),
+        .hex0(hex0),
+        .hex1(hex1),
+        .hex2(hex2),
+        .hex3(hex3),
+        .hex4(hex4),
+        .hex5(hex5),
+        .hex6(hex6),
+        .hex7(hex7),
+        .hex8(hex8),
+        .hex9(hex9),
+        .hex10(hex10),
+        .dot(dot),
+        .GPIO_0(GPIO_0),
+        .GPIO_1(GPIO_1),
+        .rows(rows),
+        .cols(cols)
     );
 
     // Clock generation
     initial begin
         clk = 0;
-        forever #5 clk = ~clk; // 100MHz clock
+        forever #5 clk = ~clk; // 10ns clock period
     end
 
     // Test sequence
     initial begin
         // Initialize inputs
-        addressVirt = 32'h0000_0000; // Address within text segment
-        
-		  #10
-		  
+        dataInVirt = 32'hA5A5A5A5;
+        addressVirt = 32'h00000000; // Starting with TEXT segment
+        wEnVirt = 0;
+        rstVirt = 1;
+        cols = 4'b0000;
+
+        // Reset pulse
+        #10;
         rstVirt = 0;
 
-        // Reset sequence
-        #10 rstVirt = 1;
-		  dataInVirt = 32'h0000_0001;
-        
-		  wEnVirt = 1;
-        // Test writing to text segment
-        #10 addressVirt = 32'h0000_0000; // VIRT_TEXT_START
-        dataInVirt = 32'hA5A5_A5A5;
+        // Test writing to TEXT segment
+        #10;
+        dataInVirt = 32'h11111111;
+        addressVirt = 32'h00000010; // TEXT segment
         wEnVirt = 1;
+        #10;
+        wEnVirt = 0;
 
-        #10 addressVirt = 32'h0FFF_FFFF; // VIRT_TEXT_END
-        dataInVirt = 32'h5A5A_5A5A;
-        wEnVirt = 1;
+        // Read back from TEXT segment
+        #10;
+        addressVirt = 32'h00000010;
+        #10;
+        $display("TEXT Segment - DataOutVirt: %h (Expected: 11111111)", dataOutVirt);
 
-        // Test writing to data segment
-        #10 addressVirt = 32'h1000_0000; // VIRT_DS_START
-        dataInVirt = 32'h1234_5678;
+        // Test writing to DS segment
+        #10;
+        dataInVirt = 32'h22222222;
+        addressVirt = 32'h10000020; // DS segment
         wEnVirt = 1;
+        #10;
+        wEnVirt = 0;
 
-        #10 addressVirt = 32'h7FFF_FFFF; // VIRT_DS_END
-        dataInVirt = 32'h8765_4321;
-        wEnVirt = 1;
+        // Read back from DS segment
+        #10;
+        addressVirt = 32'h10000020;
+        #10;
+        $display("DS Segment - DataOutVirt: %h (Expected: 22222222)", dataOutVirt);
 
         // Test writing to IO segment
-        #10 addressVirt = 32'hFFFF_0000; // VIRT_IO_START
-        dataInVirt = 32'hDEAD_BEEF;
+        #10;
+        dataInVirt = 32'h33333333;
+        addressVirt = 32'hFFFF0004; // IO segment
         wEnVirt = 1;
-
-        #10 addressVirt = 32'hFFFF_FFFF; // VIRT_IO_END
-        dataInVirt = 32'hBEEF_DEAD;
-        wEnVirt = 1;
-
-        // Test read from text segment
-        #10 addressVirt = 32'h0000_0000; // VIRT_TEXT_START
+        #10;
         wEnVirt = 0;
 
-        #10 addressVirt = 32'h0FFF_FFFF; // VIRT_TEXT_END
-        wEnVirt = 0;
+        // Read back from IO segment
+        #10;
+        addressVirt = 32'hFFFF0004;
+        #10;
+        $display("IO Segment - DataOutVirt: %h (Expected: 33333333)", dataOutVirt);
 
+        // Additional test cases can be added as needed for further address space coverage
+        
         // End of test
-        #10 $stop;
+        #50;
+        $stop;
     end
+
 endmodule
