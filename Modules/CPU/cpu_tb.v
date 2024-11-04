@@ -6,6 +6,7 @@ module cpu_tb;
     reg clk;
     wire clk0, clk2;
     reg rst;
+    wire [1:0] state;
     wire [31:0] instruction, address;
     wire [31:0] Ra_rf, Rb_rf;
     wire [31:0] pc;
@@ -28,13 +29,12 @@ module cpu_tb;
     // Instantiate CPU
     cpu uut (
         .clk(clk),
-        .clk0(clk0),
-        .clk2(clk2),
         .rst(rst),
         .address(address),
         .instruction(instruction),
         .Ra_rf(Ra_rf),
         .Rb_rf(Rb_rf),
+        .state(state),
         .pc(pc),
         .M1(M1),
         .M2(M2),
@@ -43,6 +43,9 @@ module cpu_tb;
         .M5(M5),
         .M6(M6),
         .M7(M7),
+        .pc_flag(pc_flag),
+        .instruction_flag(instruction_flag),
+        .change_address_flag(change_address_flag),
         .Wr_en(Wr_en),
         .Eq(Eq),
         .ALU(ALU),

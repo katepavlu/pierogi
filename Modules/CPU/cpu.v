@@ -1,34 +1,14 @@
 module cpu(
     input clk, // 50 MHz
     input rst,
-    output wire clk0, clk2,
     output reg [31:0] instruction, address,
     output [31:0] Ra_rf, Rb_rf,
     output reg [31:0] pc,
-    output M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq,
+    output wire [1:0] state,
+    output M1, M2, M3, M4, M5, M6, M7, Wr_en, Eq, pc_flag, instruction_flag, change_address_flag,
     output [3:0] ALU,
     output [31:0] mux5_out0, mux4_out0, mux7_out
 );
-
-wire locked;
-reg memory_instruction;
-
-// Assign clk0 to clk
-assign clk0 = clk;
-
-// Internal clock divider for clk2
-reg clk2_internal = 0;
-
-always @(posedge clk or negedge rst) begin
-    if (!rst) begin
-        clk2_internal <= 0;
-    end else begin
-        clk2_internal <= ~clk2_internal;  // Toggle clk2 every second rising edge
-    end
-end
-
-assign clk2 = clk2_internal;
-
 
 // Memory unit
 wire [31:0] memory_out;
@@ -51,31 +31,34 @@ wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out, mux6_out;
 // Declare outputs for mux4 and mux5
 wire [31:0] mux4_out1, mux5_out1;
 
-always @(posedge clk0) begin
-	memory_instruction = M7;
-	address = pc;
-    if (memory_instruction == 0 & clk2==0) 
-        address = mux4_out0;
-		  memory_instruction = 1;
-end
-
 // Initialize pc
 initial begin 
     pc = 32'b0;
 end
 
-// Equality check
-assign Eq = (Ra_rf == Rb_rf) ? 1'b1 : 1'b0;
+// Address to pc and instruction fetch
+always @(posedge clk) begin
+    if (instruction_flag  == 1'b1) begin
+        address <= pc;
+        instruction <= memory_out;
+    end else if (change_address_flag  == 1'b1) begin
+        address <= mux4_out0;
+    end
+end
 
 
 // Always block to update 'pc'
-always @(negedge clk2 or negedge rst) begin
-    if (!rst)
-        pc <= 32'b0;
-    else
-        pc <= mux1_out;
-		  instruction = memory_out;
+always @(posedge clk or negedge rst) begin
+        if (!rst)
+            pc <= 32'b0;
+        else  if (pc_flag==1'b1)
+            pc <= mux1_out;
+        
 end
+
+
+// Equality check
+assign Eq = (Ra_rf == Rb_rf) ? 1'b1 : 1'b0;
 
 // Adder instance
 adder add (
@@ -86,7 +69,7 @@ adder add (
 
 // Register file instance
 register_file RF (
-    .clk(clk2),
+    .clk(clk),
     .rst_n(rst),
     .read_Ra(Ra),
     .read_Rb(Rb),
@@ -98,8 +81,8 @@ register_file RF (
 
 // Control unit instance
 control ctrl (
-	 .clk0(clk0),
-	 .clk2(clk2),
+	.clk(clk),
+    .reset(rst),
     .opcode(opcode),
     .Eq(Eq),
     .M1(M1),
@@ -109,6 +92,10 @@ control ctrl (
     .M5(M5),
     .M6(M6),
     .M7(M7),
+    .state(state),
+    .pc_flag(pc_flag),
+    .change_address_flag(change_address_flag),
+    .instruction_flag(instruction_flag),
     .ALU(ALU),
     .Wr_en(Wr_en)
 );
@@ -184,7 +171,7 @@ memory_integrated mem(
     .addressVirt(address),
     .wEnVirt(Wr_en),
     .rstVirt(rst),
-    .clk(clk0),
+    .clk(clk),
     .dataOutVirt(memory_out)
 );
 
