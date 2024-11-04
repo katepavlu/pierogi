@@ -32,8 +32,13 @@ module peripherals(
 	output wire [6:0] HEX3,
 	output wire [6:0] HEX4,
 	output wire [6:0] HEX5,
-	output wire [35:0] GPIO_0,
+	output wire [6:0] HEX6,
+	output wire [6:0] HEX7,
+	output wire [6:0] HEX8,
+	output wire [6:0] HEX9,
+	output wire [6:0] HEX10,
 	
+	output wire [35:0] GPIO_0,
 	inout wire [35:0] GPIO_1,	
 	input wire CLOCK_50,
 	input wire [1:0] KEY
@@ -44,10 +49,9 @@ module peripherals(
 	wire dot;
 	wire [3:0] rows;
 	wire clkd;
-	wire [3:0] address = 4'h0;  // Example address, you may need to set this based on your CPU control logic
-	wire din = 1'b0;            // Example data input, set based on your CPU or external signals
-	wire writeEnable = 1'b0;    // Example write enable, set based on your control logic
-	wire dout;
+	wire [3:0] address = 4'h0; 
+	wire [31:0] din = 32'h00000000;  // Example data input
+	wire writeEnable = 1'b0;  
 
 	// Peripheral controller instantiation
 	peripheral_controller pc0(
@@ -66,6 +70,7 @@ module peripherals(
 		.rows(GPIO_1[29:26]),
 		.cols(GPIO_1[33:30]),  
 		.clk(clkd),
+		.reset(KEY[0]),
 		.address(address),
 		.din(din),
 		.writeEnable(writeEnable),
