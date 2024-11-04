@@ -20,7 +20,7 @@ module peripheral_controller(
 	input wire [3:0] address,
 	input wire [31:0] din,
 	input wire writeEnable,
-	output reg [7:0] dout
+	output reg [31:0] dout
 );
  
 	reg [31:0] display_din;
