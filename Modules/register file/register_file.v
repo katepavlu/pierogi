@@ -1,6 +1,7 @@
 module register_file (
     input clk,                       // Clock signal
     input rst_n,                     // Synchronized active-low reset
+    input wen,                       // Write enable
     input [3:0] read_Ra,             // Address for the first read port
     input [3:0] read_Rb,             // Address for the second read port
     input [3:0] write_Rd,            // Address for the write port
@@ -29,7 +30,7 @@ module register_file (
     end
 
     // Write operation with synchronized active-low reset
-    always @(negedge clk) begin
+    always @(posedge clk) begin
         if (!rst_n) begin
             // Reset all registers to 0 when rst_n is low
             for (i = 0; i < 16; i = i + 1) begin
@@ -37,8 +38,9 @@ module register_file (
             end
         end 
         // Write data to the specified register
-        registers[write_Rd] <= write_data;
-		  registers[0] = 32'b0;
+        if (wen)
+            registers[write_Rd] <= write_data;
+        registers[0] = 32'b0;
     end
 
 endmodule
