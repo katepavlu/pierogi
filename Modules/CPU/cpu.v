@@ -62,7 +62,7 @@ always @(*) begin
     if (change_address_flag  == 1'b1) begin
         address = mux4_out0;
     end else begin
-        address = adder_out;
+        address = pc;
     end
 end
 
