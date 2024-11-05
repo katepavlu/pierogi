@@ -1,3 +1,6 @@
+// the keypad has to operate at a very slow frequency because of hardware limitations
+// so we are reducing its clock to 1 kHz
+
 module ClockDivider(input clk, output reg clkd);
 
 	reg [31:0] ctr;

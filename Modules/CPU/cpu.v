@@ -1,3 +1,4 @@
+// module is separated for simulation, because it has too many pins to be applied to hardware
 module cpu_logic(
     input wire clk, // 50 MHz
     input rst,
@@ -220,6 +221,8 @@ memory_integrated mem(
 
 endmodule
 
+
+// module with fewer ports for hardware
 module cpu(
     input wire CLOCK_50, // 50 MHz
     input [3:0]KEY,

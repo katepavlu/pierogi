@@ -153,14 +153,14 @@ read_key:
 
 .text
 # display a signed number
-# dummy function - used for easy testing in mips
+# it is a separate function to enable easy testing in MIPS
 print:
     la $a1, DISPLAY
     sw $a0, $a1
     j $zero, $ra
 
 # read the keyboard peripheral
-# dummy function - used for easy testing in mips
+# it is a separate function to enable easy testing in MIPS
 poll_keyboard:
     la $a0, KEYBOARD
     lw $v, $a0

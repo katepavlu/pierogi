@@ -1,3 +1,5 @@
+// maps peripherals to memory
+
 module peripheral_controller(
 	output wire [6:0] hex0,
 	output wire [6:0] hex1,
@@ -26,7 +28,7 @@ module peripheral_controller(
 	reg [31:0] display_din;
 	wire [31:0] keyboard_dout;
 	// dummy signal
-	wire [31:0] dummy_filtered_out;
+	//wire [31:0] dummy_filtered_out;
 	
 	always @(posedge clk) begin
 		if (!reset) begin
@@ -79,12 +81,12 @@ module peripheral_controller(
 		.clk(clkd),              
 		.filtered_out(keyboard_dout)
 	);
-
-	// dummy_keypad module
+/*
+	// dummy_keypad module for testing
 	dummy_keypad u_dummy_keypad (
 		.clk(clkd),                  
 		.dummy_out(dummy_filtered_out)
 	);
-    
+*/   
 	
 endmodule

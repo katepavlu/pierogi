@@ -1,3 +1,5 @@
+// debounced, multiplexed 4x4 keypad
+// returns ascii value of key that was pressed
 module keypad_peripheral(
 	output reg [3:0] cols,
 	input wire [3:0] rows,
@@ -31,8 +33,8 @@ module keypad_peripheral(
 		else begin
 			 debounce_counter <= 0;
 			 
-			 if(old_out == out) filtered_out <= out;  // latch the keypress
-			 old_out <= out;
+			 if(old_out == out) filtered_out <= out;
+			 old_out <= out;  // latch the keypress if debounced value matches
 		end
 	
 		case(cols)

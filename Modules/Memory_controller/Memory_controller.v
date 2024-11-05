@@ -1,3 +1,10 @@
+// this translates the CPU's virtual address space
+// to actual physical or IO memory devices.
+
+// Each physical / IO word is mapped to many different addresses,
+// since they are much smaller than the virtual space.
+
+
 module Memory_controller( 
 		dataInVirt,
 		addressVirt,
@@ -28,7 +35,10 @@ module Memory_controller(
 	
 	
 	parameter PHYS_ADDR_BITS = 11;
-	parameter IO_ADDR_BITS = 4;
+    // 2048 words were chosen arbitrarily. It is more than enough to contain our entier program,
+    // but not so much that addressing would slow down execution noticeably.
+	parameter IO_ADDR_BITS = 4; 
+    // while we have only two peripherals, we left some room for expansion. This was ultimately not used.
 	
 	parameter DS_OFFSET_SHIFT = 1;
 	// in physical memmory, the data segment will start at address (capacity)>>DATA_OFFSET_SHIFT
