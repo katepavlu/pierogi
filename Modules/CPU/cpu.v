@@ -16,13 +16,14 @@ module cpu_logic(
 
 wire rst;
 wire clk;
-assign rst = KEY[0];
+assign rst = KEY[1];
 
 /*
 wire PLL_clk;
 wire PLL_lock;
 
 assign clk = PLL_clk & PLL_lock;
+
 pll pll1 (
 		.refclk(CLOCK_50),   //  refclk.clk
 		.rst(!rst),      //   reset.reset

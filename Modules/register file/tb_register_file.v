@@ -1,14 +1,16 @@
 `timescale 1ns / 1ps
 
 module tb_register_file;
-
-    // Testbench signals
+    // Inputs
     reg clk;
     reg rst_n;
+    reg wen;
     reg [3:0] read_Ra;
     reg [3:0] read_Rb;
     reg [3:0] write_Rd;
     reg [31:0] write_data;
+
+    // Outputs
     wire [31:0] data_Ra;
     wire [31:0] data_Rb;
 
@@ -16,6 +18,7 @@ module tb_register_file;
     register_file uut (
         .clk(clk),
         .rst_n(rst_n),
+        .wen(wen),
         .read_Ra(read_Ra),
         .read_Rb(read_Rb),
         .write_Rd(write_Rd),
@@ -27,55 +30,61 @@ module tb_register_file;
     // Clock generation
     initial begin
         clk = 0;
-        forever #5 clk = ~clk; // 10ns clock period
+        forever #5 clk = ~clk;  // 10ns clock period
     end
 
     // Test procedure
     initial begin
-	 
-			rst_n = 0;
-			read_Ra = 4'd2;
-        // Test case 1: Apply reset
-        rst_n = 0; // Activate reset
-        #10;
-        rst_n = 1; // Deactivate reset
-        #10;
+        // Initialize inputs
+        rst_n = 0;
+        wen = 0;
+        read_Ra = 0;
+        read_Rb = 1;
+        write_Rd = 0;
+        write_data = 0;
 
-        // Test case 2: Write to register 5
-        write_Rd = 4'd5;
+        // Apply reset
+        #10 rst_n = 1;   // Release reset after 10ns
+
+        // Test 1: Write to register 1 and read it back
+        #10 wen = 1;
+        write_Rd = 4'd1;
         write_data = 32'hA5A5A5A5;
+        #10 wen = 0;     // Disable write enable
+
+        // Read register 1 to data_Ra
+        read_Ra = 4'd1;
         #10;
 
-        // Test case 3: Disable write and read from register 5
-        read_Ra = 4'd5;
-        #10;
-        $display("Read data from register 5: %h", data_Ra);
-
-        // Test case 4: Write to register 10
-        write_Rd = 4'd10;
+        // Test 2: Write to register 2 and read it back on data_Rb
+        #10 wen = 1;
+        write_Rd = 4'd2;
         write_data = 32'h5A5A5A5A;
+        #10 wen = 0;
+
+        // Read register 2 to data_Rb
+        read_Rb = 4'd2;
         #10;
 
-        // Test case 5: Read from register 5 and register 10
-        read_Ra = 4'd5;
-        read_Rb = 4'd10;
-        #10;
-        $display("Read data from register 5: %h", data_Ra);
-        $display("Read data from register 10: %h", data_Rb);
+        // Test 3: Reset and verify that registers are cleared
+        rst_n = 0;
+        #10 rst_n = 1;
 
-        // Test case 6: Re-apply reset and check if all registers are reset
-        rst_n = 0; // Activate reset
-        #10;
-        rst_n = 1; // Deactivate reset
+        // Check if register 1 and register 2 are reset to 0
+        read_Ra = 4'd1;
+        read_Rb = 4'd2;
         #10;
 
-        read_Ra = 4'd5;
-        read_Rb = 4'd10;
-        #10;
-        $display("Read data from register 5 after reset: %h", data_Ra);
-        $display("Read data from register 10 after reset: %h", data_Rb);
+        // Test 4: Write to register 0 and confirm that it always reads as 0
+        wen = 1;
+        write_Rd = 4'd0;
+        write_data = 32'hFFFFFFFF;
+        #10 wen = 0;
 
+        read_Ra = 4'd0;
+        #10;
+
+        // Finish the simulation
         $stop;
     end
-
 endmodule
