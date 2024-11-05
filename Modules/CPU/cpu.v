@@ -3,12 +3,12 @@ module cpu_logic(
     input rst,
     output reg [31:0] instruction, address,
     output reg [31:0] pc,
-    output wire state,
+    output wire [1:0]state,
     output M13, M2, M457, M6, Wr_en, Eq, pc_flag, instruction_flag, change_address_flag, Wr_en_rf,
     output [3:0] ALU,
     output [31:0] mux7_out,
     
-    output [31:0]memory_out,
+    output [31:0]memory_out, mux5_out1, mux6_out,
     
     inout [35:0] GPIO_1,
     output [35:0] GPIO_0,
@@ -47,10 +47,10 @@ assign Rb = instruction[19:16];
 assign imm = instruction[15:0];
 
 // Mux outputs
-wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out, mux6_out, mux5_out0, mux4_out0;
+wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out, mux5_out0, mux4_out0;
 
 // Declare outputs for mux4 and mux5
-wire [31:0] mux4_out1, mux5_out1;
+wire [31:0] mux4_out1;
 
 // Initialize pc
 initial begin 
@@ -73,7 +73,7 @@ end
 
 
 // Always block to update 'pc'
-always @(posedge clk or negedge rst) begin
+always @(posedge clk) begin
         if (!rst)
             pc <= 32'b0;
         else  if (pc_flag==1'b1)

@@ -5,9 +5,9 @@ module cpu_tb;
     // Testbench signals
     reg clk;
     reg rst;
-    wire state;
+    wire [1:0]state;
     wire [31:0] instruction, address;
-    wire [31:0] Ra_rf, Rb_rf;
+    wire [31:0] Ra, Rb;
     wire [31:0] pc;
     wire M13, M2, M457, M6, Wr_en, Eq, Wr_en_rf;
     wire [3:0] ALU;
@@ -35,6 +35,7 @@ module cpu_tb;
     .M13(M13), .M2(M2), .M457(M457), .M6(M6),
     .Wr_en(Wr_en), .Eq(Eq), .pc_flag(pc_flag), .instruction_flag(instruction_flag),
     .change_address_flag(change_address_flag), .Wr_en_rf(Wr_en_rf),
+    .mux5_out1(Ra), .mux6_out(Rb),
     .ALU(ALU),
     .mux7_out(mux7_out),
     .memory_out(memory_out)

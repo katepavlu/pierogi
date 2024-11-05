@@ -11,7 +11,7 @@ module control(
     output reg instruction_flag,
     output reg change_address_flag,
     output reg Wr_en_rf,
-    output reg state,
+    output reg [1:0]state,
     output reg [3:0] ALU,
     output reg Wr_en
     );
@@ -26,18 +26,16 @@ module control(
         change_address_flag <= 1'b0;
         ALU = 4'b0000;
         Wr_en <= 1'b0;
-        state <= 1'b0;
+        state <= 0;
     end
 
     // State machine for sequential control
 always @(posedge clk) begin
     case (state)
-        1'b0: begin
-            state <= 1'b1;
-        end
-        1'b1: begin
-            state <= 1'b0;
-        end
+        0: state <= 1;
+        1: state <= 2;
+        2: state <= 3;
+        3: state <= 0;        
     endcase
 end
 
@@ -48,20 +46,34 @@ always @(*) begin
     change_address_flag <= 0;
     Wr_en_rf <= 0;
     case (state)
-        1'b0: begin
+        0: begin
             change_address_flag <= 1;
-            Wr_en <= 0;
-            pc_flag <= 1;
-            Wr_en_rf <= 1;
-            instruction_flag <= 1;
-        end
-        1'b1: begin
-            change_address_flag <= 0;
+            pc_flag <= 0;
             if (opcode == 4'b1111)
                 Wr_en <= 1;
             Wr_en_rf <= 0;
+            instruction_flag <= 0;
+        end
+        1: begin
+            change_address_flag <= 0;
+            Wr_en <= 0;
+            Wr_en_rf <= 1;
+            pc_flag <= 1;
+            instruction_flag <= 0;
+        end
+        2: begin
+            change_address_flag <= 0;
+            Wr_en <= 0;
+            Wr_en_rf <= 0;
             pc_flag <= 0;
             instruction_flag <= 0;
+        end
+        3: begin
+            change_address_flag <= 0;
+            Wr_en <= 0;
+            Wr_en_rf <= 0;
+            pc_flag <= 0;
+            instruction_flag <= 1;
         end
     endcase
 end
