@@ -53,7 +53,7 @@ always @(*) begin
             Wr_en <= 0;
             pc_flag <= 1;
             Wr_en_rf <= 1;
-            instruction_flag <= 0;
+            instruction_flag <= 1;
         end
         1'b1: begin
             change_address_flag <= 0;
@@ -61,7 +61,7 @@ always @(*) begin
                 Wr_en <= 1;
             Wr_en_rf <= 0;
             pc_flag <= 0;
-            instruction_flag <= 1;
+            instruction_flag <= 0;
         end
     endcase
 end
