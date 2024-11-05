@@ -7,15 +7,9 @@ module ClockDivider(input clk, output reg clkd);
 		ctr = 0;
 	end
 	
-	reg clk2 = 0;
-	
-	// Toggle clk2 on each positive edge of clk
-	always @(posedge clk) 
-		clk2 <= ~clk2;
-	
 	// Clock division logic
-	always @(posedge clk2) begin
-		if (ctr < 25_000)
+	always @(posedge clk) begin
+		if (ctr < 1_000)
 			ctr <= ctr + 1;
 		else begin
 			ctr <= 0;

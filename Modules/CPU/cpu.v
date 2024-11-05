@@ -1,4 +1,4 @@
-module cpu(
+module cpu_logic(
     input wire CLOCK_50, // 50 MHz
     input [3:0]KEY,
     output reg [31:0] instruction, address,
@@ -14,18 +14,24 @@ module cpu(
     
 );
 
-
-
-wire clk;
 wire rst;
-
+wire clk;
 assign rst = KEY[0];
+
+/*
+wire PLL_clk;
+wire PLL_lock;
+
+assign clk = PLL_clk & PLL_lock;
 pll pll1 (
 		.refclk(CLOCK_50),   //  refclk.clk
 		.rst(!rst),      //   reset.reset
-		.outclk_0(clk)  // outclk0.clk
+		.outclk_0(PLL_clk),  // outclk0.clk
+        .locked(PLL_lock)
 	);
-
+*/
+assign clk = CLOCK_50;
+    
 // Memory unit
 wire [31:0] memory_out, Ra_rf, Rb_rf;
 
@@ -212,5 +218,25 @@ memory_integrated mem(
    
 
 
+
+endmodule
+
+module cpu(
+    input wire CLOCK_50, // 50 MHz
+    input [3:0]KEY,
+ 
+    inout [35:0] GPIO_1,
+    output [35:0] GPIO_0,
+    output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5
+    
+);
+
+cpu_logic cpu0 (
+    .CLOCK_50(CLOCK_50), // 50 MHz
+    .KEY(KEY),
+    .GPIO_1(GPIO_1),
+    .GPIO_0(GPIO_0),
+    .HEX0(HEX0), .HEX1(HEX1), .HEX2(HEX2), .HEX3(HEX3), .HEX4(HEX4), .HEX5(HEX5)
+    );
 
 endmodule

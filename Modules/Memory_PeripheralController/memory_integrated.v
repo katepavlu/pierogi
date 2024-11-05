@@ -11,8 +11,8 @@ module memory_integrated(
     output wire dot,	
 	 
 	 // Keypad connections for peripheral_controller
-    output wire [3:0] rows,
-    input wire [3:0] cols
+    output wire [3:0] cols,
+    input wire [3:0] rows
 	 
 );
 
@@ -88,8 +88,5 @@ module memory_integrated(
         
  
     );
-	 
-	 
-	
 
 endmodule

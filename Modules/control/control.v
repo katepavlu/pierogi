@@ -51,6 +51,7 @@ always @(*) begin
     Wr_en <= 0;
     pc_flag <= 0;
     instruction_flag <= 0;
+    change_address_flag <= 0;
     Wr_en_rf <= 0;
     case (state)
         2'b00: begin

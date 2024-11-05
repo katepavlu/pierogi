@@ -26,7 +26,7 @@ module cpu_tb;
     end
 
     // Instantiate CPU
-     cpu uut(
+    cpu_logic uut(
     .CLOCK_50(clk), // 50 MHz
     .KEY(rst),
     .instruction(instruction), .address(address),
@@ -42,7 +42,7 @@ module cpu_tb;
     // Simulation control
     initial begin
         // Run the simulation for a certain period
-        #1500;
+        #1500000;
         $stop;   // End the simulation after 2500 ns
     end
 
