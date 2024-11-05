@@ -7,7 +7,7 @@ module mctrl_tb();
 	reg wEnVirt;
 	reg rstVirt;
 		
-	wire [10:0]addressPhys;
+	wire [31:0]addressPhys;
 	wire [31:0] dataInPhys;
 	reg [31:0] dataOutPhys;
 	wire wEnPhys;

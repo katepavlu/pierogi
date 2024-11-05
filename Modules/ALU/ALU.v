@@ -17,7 +17,7 @@ module ALU(
             4'b0011: outBus = ~busA;              // NOT operation
             4'b0100: outBus = busA + busB;        // ADD operation
             4'b0101: outBus = busA - busB;        // SUB operation
-            4'b0110: outBus = (busA < busB) ? 32'b1 : 32'b0;  // Compare (A < B)
+            4'b0110: outBus = (busA > busB) ? 32'b1 : 32'b0;  // Compare (A > B)
             4'b1010: outBus = busA << busB[4:0];               // Shift left by imm
             4'b1011: outBus = busA >> busB[4:0];               // Shift right by imm
             4'b1101: outBus = busB << 16;                      // Load upper immediate (LUI)

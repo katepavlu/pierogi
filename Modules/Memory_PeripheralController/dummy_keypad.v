@@ -4,7 +4,7 @@ module dummy_keypad (
 );
 
     initial begin
-        dummy_out = 32'h55;  // Initialize dummy_out with a known value
+        dummy_out = 32'd1234;  // Initialize dummy_out with a known value
     end
 
    

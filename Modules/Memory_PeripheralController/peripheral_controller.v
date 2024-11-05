@@ -12,8 +12,8 @@ module peripheral_controller(
 	output wire [6:0] hex10,
 	output wire dot,
 	
-	output wire [3:0] rows,
-	input wire [3:0] cols,
+	input wire [3:0] rows,
+	output wire [3:0] cols,
 	
 	input wire clk,
 	input wire reset,           // Added reset signal
@@ -31,23 +31,21 @@ module peripheral_controller(
 	always @(posedge clk) begin
 		if (!reset) begin
 			// Reset internal registers to default values
-			dout <= 32'b0;
 			display_din <= 32'b0;
 		end else begin
-			dout <= 32'b0;  // Default dout to 0 unless overridden
-			
-			case (address)
-				4'h0: begin
-					// Replace dummy with keyboard_dout if you are done simulating
-					dout <= keyboard_dout;
-				end
-				4'h4: begin
-					if (writeEnable) 
-						display_din <= din;
-				end
-			endcase
+			if ((writeEnable) && (address == 4))
+				display_din <= din;
 		end
 	end
+    
+    always @(posedge clk) begin
+    	if (address == 0)
+					// Replace dummy with keyboard_dout if you are done simulating
+			dout <= keyboard_dout;
+
+		else
+            dout <= 0;    
+    end
 	
 	// Instantiate the display and keypad peripherals
 	display_peripheral dp0(
@@ -81,12 +79,12 @@ module peripheral_controller(
 		.clk(clkd),              
 		.filtered_out(keyboard_dout)
 	);
-/*
+
 	// dummy_keypad module
 	dummy_keypad u_dummy_keypad (
 		.clk(clkd),                  
 		.dummy_out(dummy_filtered_out)
 	);
-    */
+    
 	
 endmodule

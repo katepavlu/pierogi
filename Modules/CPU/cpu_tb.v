@@ -11,7 +11,7 @@ module cpu_tb;
     wire [31:0] pc;
     wire M13, M2, M457, M6, Wr_en, Eq, Wr_en_rf;
     wire [3:0] ALU;
-    wire [31:0] mux7_out, memory_out;
+    wire [31:0] mux3_out, memory_out;
 
     // Clock generation
     initial begin
@@ -37,7 +37,7 @@ module cpu_tb;
     .change_address_flag(change_address_flag), .Wr_en_rf(Wr_en_rf),
     .mux5_out1(Ra), .mux6_out(Rb),
     .ALU(ALU),
-    .mux7_out(mux7_out),
+    .mux3_out(mux3_out),
     .memory_out(memory_out)
     );
 

@@ -9,7 +9,7 @@ module ClockDivider(input clk, output reg clkd);
 	
 	// Clock division logic
 	always @(posedge clk) begin
-		if (ctr < 1_000)
+		if (ctr < 50000)
 			ctr <= ctr + 1;
 		else begin
 			ctr <= 0;

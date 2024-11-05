@@ -40,7 +40,7 @@ module Memory_controller(
 	input wire wEnVirt;
 	input wire rstVirt;
 		
-	output reg [10:0]addressPhys;
+	output reg [31:0] addressPhys;
 	output reg [31:0] dataInPhys;
 	input wire [31:0] dataOutPhys;
 	output reg wEnPhys;
@@ -67,21 +67,21 @@ module Memory_controller(
 		dataInIO <= 0;
 		wEnIO <= 0;
 	
-		if ( VIRT_TEXT_START <= addressVirt && addressVirt <= VIRT_TEXT_END ) begin
+		if ( (VIRT_TEXT_START <= addressVirt) && (addressVirt <= VIRT_TEXT_END) ) begin
 				dataInPhys <= dataInVirt;
 				addressPhys <= addressVirt - VIRT_TEXT_START;
 				dataOutVirt <= dataOutPhys;
 				wEnPhys <= wEnVirt;
 		end
 		
-		else if ( VIRT_DS_START <= addressVirt && addressVirt <= VIRT_DS_END ) begin
+		else if ( (VIRT_DS_START <= addressVirt) && (addressVirt <= VIRT_DS_END) ) begin
 				dataInPhys <= dataInVirt;
-				addressPhys <= addressVirt - VIRT_DS_START + ((2**PHYS_ADDR_BITS) >> DS_OFFSET_SHIFT );
+				addressPhys <= addressVirt - VIRT_DS_START + ((2**(PHYS_ADDR_BITS+2)) >> DS_OFFSET_SHIFT );
 				dataOutVirt <= dataOutPhys;
 				wEnPhys <= wEnVirt;
 		end
 		
-		else if ( VIRT_IO_START <= addressVirt && addressVirt <= VIRT_IO_END ) begin
+		else if ( (VIRT_IO_START <= addressVirt) && (addressVirt <= VIRT_IO_END) ) begin
 				dataInIO <= dataInVirt;
 				addressIO <= (addressVirt - VIRT_IO_START);
 				dataOutVirt <= dataOutIO;

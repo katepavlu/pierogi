@@ -55,7 +55,7 @@ always @(*) begin
             instruction_flag <= 0;
         end
         1: begin
-            change_address_flag <= 0;
+            change_address_flag <= 1;
             Wr_en <= 0;
             Wr_en_rf <= 1;
             pc_flag <= 1;

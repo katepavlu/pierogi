@@ -18,7 +18,7 @@ module memory_integrated(
 
 
     // Internal connections for BRAM (Physical Memory)
-    wire [10:0] addressPhys;
+    wire [31:0] addressPhys;
     wire [31:0] dataInPhys, dataOutPhys;
     wire wEnPhys, rstPhys;
 	 
@@ -54,7 +54,7 @@ module memory_integrated(
 
     // Instantiate BRAM for Physical Memory
     BRAM bram (
-        .addr({21'b0, addressPhys}), // Convert 11-bit physical address to 32-bit
+        .addr(addressPhys), // Convert 11-bit physical address to 32-bit
         .din(dataInPhys),
         .clk(clk),
         .wren(wEnPhys),

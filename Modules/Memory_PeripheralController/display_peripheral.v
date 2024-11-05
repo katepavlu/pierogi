@@ -90,9 +90,9 @@ module display_peripheral(
         .LEDpins(hex9)
     );
 
-   assign hex10[4:0] = -1;
-	assign hex10[5] = ~(din<0);
-	assign hex10[6] = 1;
+   assign hex10[5:0] = -1;
+	assign hex10[6] = ~(din<0);
+
 	
     
     // Set dot to 1 (off) for simplicity; modify if you want a specific behavior

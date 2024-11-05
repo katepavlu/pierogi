@@ -6,7 +6,7 @@ module cpu_logic(
     output wire [1:0]state,
     output M13, M2, M457, M6, Wr_en, Eq, pc_flag, instruction_flag, change_address_flag, Wr_en_rf,
     output [3:0] ALU,
-    output [31:0] mux7_out,
+    output [31:0] mux3_out, mux7_out,
     
     output [31:0]memory_out, mux5_out1, mux6_out,
     
@@ -47,7 +47,7 @@ assign Rb = instruction[19:16];
 assign imm = instruction[15:0];
 
 // Mux outputs
-wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux3_out, mux5_out0, mux4_out0;
+wire [31:0] mux1_out, mux2_out, adder_out, ALU_out, mux5_out0, mux4_out0;
 
 // Declare outputs for mux4 and mux5
 wire [31:0] mux4_out1;
@@ -146,7 +146,7 @@ mux mux2 (
 
 mux mux3 (
     .in0(mux7_out),
-    .in1(pc),
+    .in1(pc + 4),
     .control(M13),
     .out(mux3_out)
 );
