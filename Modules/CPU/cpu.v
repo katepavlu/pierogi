@@ -19,7 +19,7 @@ module cpu(
 wire clk;
 wire rst;
 
-assign rst = KEY[0];
+assign rst = KEY[1];
 pll pll1 (
 		.refclk(CLOCK_50),   //  refclk.clk
 		.rst(!rst),      //   reset.reset
